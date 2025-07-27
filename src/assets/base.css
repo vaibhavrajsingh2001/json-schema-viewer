@@ -1,3 +1,12 @@
+:root {
+  --kui-color-background: transparent;
+  --kui-color-background-neutral-weakest: transparent;
+  --jse-theme-color: #62a8ac;
+  --jse-selection-background-color: transparent;
+  --jse-background-color: transparent;
+  --jse-selection-background-inactive-color: #ffdd88;
+}
+
 *,
 *::before,
 *::after {

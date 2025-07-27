@@ -1,1 +1,6 @@
 @import './base.css';
+
+.splitpanes__splitter {
+  min-width: 2px !important;
+  background-color: black;
+}

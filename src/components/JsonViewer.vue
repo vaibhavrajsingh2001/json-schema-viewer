@@ -1,15 +1,10 @@
 <template>
   <Splitpanes class="container">
     <Pane>
-      <code class="content-area" contenteditable @input="handleUpdateValue">
-        {{ jsonContent }}
-      </code>
+      <JsonEditor class="json-editor" v-model:json="jsonContent" />
     </Pane>
     <Pane class="schema-pane">
-      <SchemaRenderer
-        v-if="jsonContent"
-        :schema="JSON.parse(jsonContent)"
-      />
+      <SchemaRenderer v-if="jsonContent" :schema="jsonContent" />
     </Pane>
   </Splitpanes>
 </template>
@@ -18,33 +13,34 @@
 import { ref } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import { SchemaRenderer } from '@kong/spec-renderer'
-import sampleSchema from '@/assets/sample-schema.json' with { type: 'json' }
+import JsonEditor from 'vue3-ts-jsoneditor'
+import sampleSchema from '@/assets/sample-schema.json'
 
-const jsonContent = ref<string>(JSON.stringify(sampleSchema, null, 2))
-
-const handleUpdateValue = (event: Event) => {
-  jsonContent.value = (event.target as HTMLElement).innerText
-}
+const jsonContent = ref(sampleSchema)
 </script>
 
-<style>
+<style scoped>
 .container {
-  .schema-pane {
-    padding: 2rem;
-    overflow: auto;
-  }
-
   &.splitpanes {
     background: #fdf0d5;
   }
 
-  .splitpanes__pane {
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2) inset;
+  .json-editor {
+    height: 100%;
+    overflow: auto;
   }
 
-  .splitpanes__splitter {
-    background: #003049;
-    width: 2px;
+  .schema-pane {
+    padding: 1rem 1.4rem;
+    overflow: auto;
+
+    :deep(.model-example-visible) {
+      grid-template-columns: auto;
+    }
+  }
+
+  .splitpanes__pane {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2) inset;
   }
 }
 </style>
