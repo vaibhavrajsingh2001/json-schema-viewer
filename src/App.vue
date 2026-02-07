@@ -20,7 +20,9 @@ import JsonViewer from './components/JsonViewer.vue'
   padding-left: 8px;
 
   h1 {
-    font-weight: 600;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.5px;
   }
 }
 

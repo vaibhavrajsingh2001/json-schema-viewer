@@ -2,19 +2,26 @@
   /* Palette */
   --color-primary: #003049;
   --color-primary-hover: #00496e;
-  --color-secondary: #fdf0d5;
+  --color-secondary: #F1F5F9;
   --color-white: #ffffff;
   --color-black: #000000;
 
   /* Layout */
   --navbar-height: 5vh;
 
+  /* Font stacks */
+  --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+
   /* Third party overrides */
-  --kui-color-background: transparent;
-  --kui-color-background-neutral-weakest: transparent;
-  --jse-theme-color: #62a8ac;
+  --jse-theme-color: #0284C7;
   --jse-background-color: transparent;
+  --jse-panel-background: transparent;
   --jse-selection-background-inactive-color: #ffdd88;
+  --jse-font-family: var(--font-sans);
+  --jse-font-family-mono: var(--font-mono);
+  --kui-font-family-text: var(--font-sans);
+  --kui-font-family-code: var(--font-mono);
 }
 
 *,
@@ -26,19 +33,7 @@
 }
 
 body {
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.4rem;
   text-rendering: optimizeLegibility;
