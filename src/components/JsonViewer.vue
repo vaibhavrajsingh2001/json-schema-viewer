@@ -32,9 +32,16 @@ const jsonContent = ref<Record<string, unknown>>(sampleSchema)
 
   .schema-pane {
     padding: 1rem 1.4rem;
+    container-type: inline-size;
 
     :deep(.model-example-visible) {
-      grid-template-columns: auto;
+      grid-template-columns: 1fr;
+    }
+
+    @container (min-width: 900px) {
+      :deep(.model-example-visible) {
+        grid-template-columns: auto clamp(410px, 40%, 575px);
+      }
     }
   }
 }
