@@ -14,9 +14,9 @@ import JsonViewer from './components/JsonViewer.vue'
 <style scoped>
 .navbar {
   align-content: center;
-  background-color: #003049;
-  color: #fdf0d5;
-  height: 5vh;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  height: var(--navbar-height);
   padding-left: 8px;
 
   h1 {
@@ -25,6 +25,6 @@ import JsonViewer from './components/JsonViewer.vue'
 }
 
 .main {
-  height: 95vh;
+  height: calc(100vh - var(--navbar-height));
 }
 </style>

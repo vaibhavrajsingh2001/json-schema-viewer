@@ -2,5 +2,5 @@
 
 .splitpanes__splitter {
   min-width: 2px !important;
-  background-color: black;
+  background-color: var(--color-black);
 }
