@@ -13,13 +13,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import { SchemaRenderer } from '@kong/spec-renderer'
 import JsonEditorVue from 'json-editor-vue'
 import sampleSchema from '@/assets/sample-schema.json' with { type: 'json' }
+import { encodeSchema, decodeSchema } from '@/utils/share'
+import { useToast } from '@/composables/useToast'
 
 const jsonContent = ref<Record<string, unknown>>(sampleSchema)
+const { show: showToast } = useToast()
+
+function loadFromUrl() {
+  const hash = window.location.hash
+  const decoded = decodeSchema(hash)
+  if (decoded) {
+    jsonContent.value = decoded
+  }
+}
+
+async function share() {
+  const hash = encodeSchema(jsonContent.value)
+  const url = `${window.location.origin}${window.location.pathname}${hash}`
+
+  try {
+    await navigator.clipboard.writeText(url)
+    showToast('Copied to clipboard!')
+    window.history.replaceState(null, '', hash)
+  } catch (err) {
+    console.error('Failed to copy to clipboard', err)
+  }
+}
+
+onMounted(() => {
+  loadFromUrl()
+})
+
+defineExpose({
+  share
+})
 
 const defaultEditorSize = 50
 const editorSize = ref(defaultEditorSize)

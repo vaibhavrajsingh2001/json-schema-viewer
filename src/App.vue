@@ -1,28 +1,69 @@
 <template>
   <nav class="navbar">
     <h1>JSON Schema Viewer</h1>
+    <button class="share-btn" title="Copy share link" @click="handleShare">
+      🔗 Share
+    </button>
   </nav>
+
   <main class="main">
-    <JsonViewer />
+    <JsonViewer ref="jsonViewerRef" />
   </main>
+  <ToastNotification />
 </template>
 
 <script setup lang="ts">
+import { useTemplateRef } from 'vue'
 import JsonViewer from './components/JsonViewer.vue'
+import ToastNotification from './components/ToastNotification.vue'
+
+const jsonViewerRef = useTemplateRef('jsonViewerRef')
+
+function handleShare() {
+  jsonViewerRef.value?.share()
+}
 </script>
 
 <style scoped>
 .navbar {
-  align-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background-color: var(--color-primary);
   color: var(--color-secondary);
   height: var(--navbar-height);
-  padding-left: 8px;
+  padding: 0 1rem;
 
   h1 {
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     letter-spacing: -0.5px;
+    margin: 0;
+  }
+}
+
+.share-btn {
+  background: var(--color-secondary);
+  color: var(--color-primary);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+
+  &:hover {
+    background: var(--color-white);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
