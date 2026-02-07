@@ -2,7 +2,7 @@
   /* Palette */
   --color-primary: #003049;
   --color-primary-hover: #00496e;
-  --color-secondary: #F1F5F9;
+  --color-secondary: #f1f5f9;
   --color-white: #ffffff;
   --color-black: #000000;
 
@@ -13,8 +13,12 @@
   --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
 
+  /* Schema Renderer overrides */
+  --kui-color-background: var(--color-secondary);
+  --kui-color-background-neutral-weakest: #f8fafc;
+
   /* Third party overrides */
-  --jse-theme-color: #0284C7;
+  --jse-theme-color: #0284c7;
   --jse-background-color: transparent;
   --jse-panel-background: transparent;
   --jse-selection-background-inactive-color: #ffdd88;
@@ -39,4 +43,29 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  line-height: inherit;
+  padding: 0;
+  transition:
+    background 0.2s,
+    opacity 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }

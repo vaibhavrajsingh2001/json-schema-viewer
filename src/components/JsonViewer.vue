@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import { SchemaRenderer } from '@kong/spec-renderer'
 import JsonEditorVue from 'json-editor-vue'
@@ -53,13 +53,11 @@ defineExpose({
   share
 })
 
-const defaultEditorSize = 50
-const editorSize = ref(defaultEditorSize)
 const editorCollapsed = ref(false)
+const editorSize = computed(() => (editorCollapsed.value ? 0 : 50))
 
 function toggleEditor() {
   editorCollapsed.value = !editorCollapsed.value
-  editorSize.value = editorCollapsed.value ? 0 : defaultEditorSize
 }
 </script>
 
@@ -86,14 +84,10 @@ function toggleEditor() {
       z-index: 10;
       background: var(--color-primary);
       color: var(--color-white);
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
       font-size: 2rem;
       padding: 0.2rem 0.6rem 0.35rem 0.6rem;
       line-height: 0.8;
       opacity: 0.85;
-      transition: opacity 0.2s, background 0.2s;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 
       &:hover {

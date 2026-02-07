@@ -45,12 +45,8 @@ function handleShare() {
 .share-btn {
   background: var(--color-secondary);
   color: var(--color-primary);
-  border: 1px solid transparent;
-  border-radius: 6px;
   padding: 0.3rem 0.8rem;
-  cursor: pointer;
   font-size: 0.9rem;
-  transition: all 0.2s;
   height: 32px;
   display: flex;
   align-items: center;
@@ -58,12 +54,7 @@ function handleShare() {
 
   &:hover {
     background: var(--color-white);
-    transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-
-  &:active {
-    transform: translateY(0);
   }
 }
 
