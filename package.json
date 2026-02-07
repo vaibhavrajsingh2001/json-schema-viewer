@@ -16,10 +16,10 @@
   },
   "dependencies": {
     "@kong/spec-renderer": "^1.95.6",
+    "json-editor-vue": "^0.18.1",
     "shiki": "^3.7.0",
     "splitpanes": "^4.0.4",
-    "vue": "^3.5.17",
-    "vue3-ts-jsoneditor": "^3.0.3"
+    "vue": "^3.5.17"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",
