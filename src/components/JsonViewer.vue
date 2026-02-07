@@ -25,17 +25,17 @@ const jsonContent = ref<Record<string, unknown>>(sampleSchema)
     background: #fdf0d5;
   }
 
+  .splitpanes__pane {
+    overflow: auto;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2) inset;
+  }
+
   .schema-pane {
     padding: 1rem 1.4rem;
-    overflow: auto;
 
     :deep(.model-example-visible) {
       grid-template-columns: auto;
     }
-  }
-
-  .splitpanes__pane {
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2) inset;
   }
 }
 </style>
