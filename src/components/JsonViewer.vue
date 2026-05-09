@@ -4,7 +4,16 @@
       <JsonEditorPane v-model="jsonContent" />
     </Pane>
     <Pane :size="100 - editorSize">
-      <SchemaPreviewPane :schema="renderableSchema" :editor-collapsed="editorCollapsed" @toggle-editor="toggleEditor" />
+      <SchemaPreviewPane :schema="renderableSchema">
+        <template #actions>
+          <PaneToggleButton
+            :collapsed="editorCollapsed"
+            :title="editorCollapsed ? 'Show editor' : 'Hide editor'"
+            size="lg"
+            @toggle="toggleEditor"
+          />
+        </template>
+      </SchemaPreviewPane>
     </Pane>
   </Splitpanes>
 </template>
@@ -18,6 +27,7 @@ import { useToast } from '@/composables/useToast'
 import { useShareableJson } from '@/composables/useShareableJson'
 import JsonEditorPane from '@/components/JsonEditorPane.vue'
 import SchemaPreviewPane from '@/components/SchemaPreviewPane.vue'
+import PaneToggleButton from '@/components/PaneToggleButton.vue'
 
 const { show: showToast } = useToast()
 const { jsonContent, share } = useShareableJson(sampleSchema as JsonValue, showToast)

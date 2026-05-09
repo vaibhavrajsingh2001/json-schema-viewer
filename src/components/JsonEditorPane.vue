@@ -1,12 +1,10 @@
 <template>
   <div class="editor-pane">
-    <button
-      class="pane-action-btn editor-sidebar-btn"
+    <PaneToggleButton
+      :collapsed="!sidebarOpen"
       :title="sidebarOpen ? 'Hide editor sidepanel' : 'Show editor sidepanel'"
-      @click="sidebarOpen = !sidebarOpen"
-    >
-      {{ sidebarOpen ? '↤' : '↦' }}
-    </button>
+      @toggle="sidebarOpen = !sidebarOpen"
+    />
     <JsonEditor
       class="json-editor"
       :value="modelValue"
@@ -25,6 +23,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { JsonEditor, type JsonValue } from '@visual-json/vue'
+import PaneToggleButton from '@/components/PaneToggleButton.vue'
 
 defineProps<{
   modelValue: JsonValue
@@ -42,11 +41,5 @@ const sidebarOpen = ref(false)
 .editor-pane {
   height: 100%;
   position: relative;
-}
-
-.editor-sidebar-btn {
-  font-size: 1rem;
-  line-height: 1;
-  padding: 0.35rem 0.55rem;
 }
 </style>

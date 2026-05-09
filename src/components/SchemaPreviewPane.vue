@@ -1,12 +1,6 @@
 <template>
   <div class="schema-pane">
-    <button
-      class="pane-action-btn collapse-btn"
-      :title="editorCollapsed ? 'Show editor' : 'Hide editor'"
-      @click="$emit('toggleEditor')"
-    >
-      {{ editorCollapsed ? '↦' : '↤' }}
-    </button>
+    <slot name="actions" />
     <SchemaRenderer v-if="schema" :schema="schema" />
   </div>
 </template>
@@ -16,11 +10,6 @@ import { SchemaRenderer } from '@kong/spec-renderer'
 
 defineProps<{
   schema: Record<string, unknown> | null
-  editorCollapsed: boolean
-}>()
-
-defineEmits<{
-  toggleEditor: []
 }>()
 </script>
 
@@ -30,12 +19,6 @@ defineEmits<{
   min-height: 100%;
   padding: 1rem 1.4rem;
   position: relative;
-}
-
-.collapse-btn {
-  font-size: 2rem;
-  padding: 0.2rem 0.6rem 0.35rem 0.6rem;
-  line-height: 0.8;
 }
 
 :deep(.model-example-visible) {
