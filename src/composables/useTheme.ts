@@ -1,22 +1,9 @@
 import { computed, ref, watch } from 'vue'
+import { fallbackTheme, themes, type ThemeId } from '@/constants/themes'
 
-/**
- * Theme options exposed to the picker.
- *
- * Keep this list in sync with the matching `:root[data-theme='<id>']` token blocks in
- * `src/assets/themes.css`. The default Harbor theme is defined on `:root` itself.
- */
-export const themes = [
-  { id: 'harbor', label: 'Harbor' },
-  { id: 'midnight', label: 'Midnight' },
-  { id: 'forest', label: 'Forest' },
-] as const
-
-/** Valid theme ids derived from the configured theme list. */
-export type ThemeId = (typeof themes)[number]['id']
+export { fallbackTheme, themeIds, themes, type ThemeId } from '@/constants/themes'
 
 const storageKey = 'json-schema-viewer-theme'
-const fallbackTheme: ThemeId = 'harbor'
 
 /** Returns true when a persisted string matches one of the supported theme ids. */
 function isThemeId(value: string | null): value is ThemeId {

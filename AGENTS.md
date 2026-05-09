@@ -31,14 +31,18 @@ pnpm install
 pnpm dev
 pnpm build
 pnpm type-check
+pnpm validate:themes
 pnpm lint
 pnpm format
 ```
 
 Notes:
 
-- `pnpm build` runs TypeScript checking and then the Vite build.
+- `pnpm build` runs theme validation, TypeScript checking, and then the Vite build.
+- `pnpm type-check` only runs Vue/TypeScript checking.
 - `pnpm lint` runs oxlint and ESLint, both with `--fix`.
+- `pnpm validate:themes` checks that `src/constants/themes.ts` theme ids match `themes.css` blocks and
+  that each theme block defines the same primitive tokens.
 - `pnpm format` only formats `src/`.
 - There is currently no test runner configured.
 
@@ -54,6 +58,7 @@ Notes:
 - `src/components/ThemePicker.vue`: theme selection UI wired to `useTheme`.
 - `src/components/ToastNotification.vue`: global toast UI.
 - `src/composables/useShareableJson.ts`: owns editable JSON state and share-link behavior.
+- `src/constants/themes.ts`: typed theme ids, labels, and fallback theme shared by app and validation.
 - `src/composables/useTheme.ts`: owns selected theme state, applies `data-theme`, and persists it.
 - `src/composables/useToast.ts`: module-level singleton toast state.
 - `src/utils/share.ts`: encode/decode helpers for `#schema/` URLs.
@@ -86,7 +91,7 @@ Notes:
   not arrays, primitives, or undefined.
 - Styling is mostly CSS variables in `src/assets/base.css` plus scoped component styles.
 - Add or tune themes by changing theme primitive tokens in `src/assets/themes.css` and adding
-  the theme id to `src/composables/useTheme.ts`.
+  the theme id/label to `src/constants/themes.ts`; run `pnpm validate:themes` afterward.
 - Components should use semantic app tokens like `--color-app-bg`, `--color-app-surface`,
   `--color-app-text`, and `--color-app-accent` rather than raw theme primitive tokens.
 - Global third-party theme overrides live in `base.css`; component-specific overrides should
