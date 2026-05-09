@@ -103,6 +103,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.app-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: -0.125em;
+}
+
 button {
   appearance: none;
   background: transparent;

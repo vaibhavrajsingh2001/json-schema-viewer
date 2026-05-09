@@ -6,12 +6,14 @@
     type="button"
     @click="$emit('toggle')"
   >
-    {{ collapsed ? '↦' : '↤' }}
+    <component :is="toggleIcon" class="app-icon" aria-hidden="true" />
   </button>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import IconPanelLeftClose from '~icons/lucide/panel-left-close'
+import IconPanelLeftOpen from '~icons/lucide/panel-left-open'
 
 const props = withDefaults(
   defineProps<{
@@ -29,6 +31,7 @@ defineEmits<{
 }>()
 
 const sizeClass = computed(() => `pane-toggle-btn--${props.size}`)
+const toggleIcon = computed(() => (props.collapsed ? IconPanelLeftOpen : IconPanelLeftClose))
 </script>
 
 <style scoped>
@@ -41,6 +44,9 @@ const sizeClass = computed(() => `pane-toggle-btn--${props.size}`)
   color: var(--color-white);
   opacity: 0.85;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     opacity: 1;
@@ -50,13 +56,11 @@ const sizeClass = computed(() => `pane-toggle-btn--${props.size}`)
 
 .pane-toggle-btn--sm {
   font-size: 1rem;
-  line-height: 1;
-  padding: 0.35rem 0.55rem;
+  padding: 0.4rem;
 }
 
 .pane-toggle-btn--lg {
-  font-size: 2rem;
-  line-height: 0.8;
-  padding: 0.2rem 0.6rem 0.35rem 0.6rem;
+  font-size: 1.5rem;
+  padding: 0.55rem;
 }
 </style>

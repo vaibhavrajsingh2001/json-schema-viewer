@@ -2,7 +2,8 @@
   <nav class="navbar">
     <h1>JSON Schema Viewer</h1>
     <button class="share-btn" title="Copy share link" @click="handleShare">
-      🔗 Share
+      <IconShare2 class="app-icon" aria-hidden="true" />
+      <span>Share</span>
     </button>
   </nav>
 
@@ -16,6 +17,7 @@
 import { useTemplateRef } from 'vue'
 import JsonViewer from './components/JsonViewer.vue'
 import ToastNotification from './components/ToastNotification.vue'
+import IconShare2 from '~icons/lucide/share-2'
 
 const jsonViewerRef = useTemplateRef('jsonViewerRef')
 
@@ -49,11 +51,16 @@ function handleShare() {
   height: 32px;
   display: flex;
   align-items: center;
+  gap: 0.35rem;
   font-weight: 500;
+
+  .app-icon {
+    font-size: 1rem;
+  }
 
   &:hover {
     background: var(--color-white);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 }
 

@@ -18,6 +18,7 @@ Core stack:
 - `@kong/spec-renderer` for schema rendering
 - `splitpanes` for the editor/preview layout
 - `lz-string` for URL hash sharing
+- `unplugin-icons` with local Iconify collections for Vue icon components
 
 There is no backend. Share links encode the current JSON in `window.location.hash`.
 
@@ -57,7 +58,7 @@ Notes:
 - `src/assets/base.css`: design tokens, resets, Visual JSON and Kong renderer overrides.
 - `src/assets/main.css`: global imports plus split pane splitter styling.
 - `src/assets/sample-schema.json`: initial schema when no valid URL hash is present.
-- `vite.config.ts`: Vite plugins, `@` alias, font loading, and build externals.
+- `vite.config.ts`: Vite plugins, `@` alias, font/icon loading, and build externals.
 
 ## Data Flow
 
@@ -84,6 +85,10 @@ Notes:
 - Global third-party theme overrides live in `base.css`; component-specific overrides should
   stay close to the relevant component.
 - The app uses nested CSS syntax in Vue scoped styles and global CSS.
+- Import UI icons from `~icons/<collection>/<icon>` and keep the matching `@iconify-json/*`
+  collection package in `devDependencies`.
+- Size icons compositionally with the global `.app-icon` utility and `font-size`; avoid
+  hardcoded SVG `width`/`height` unless an icon genuinely needs a one-off override.
 - Keep comments sparse and useful; existing comments explain integration quirks.
 
 ## Build And Integration Gotchas
@@ -94,6 +99,8 @@ Notes:
   `src/main.ts`; do not remove them while those libraries are in use.
 - `@visual-json/vue` injects default theme variables inline, so overrides under
   `[data-vj-root]` use `!important`.
+- `env.d.ts` includes `unplugin-icons/types/vue` so TypeScript can resolve virtual
+  `~icons/...` imports.
 - `SchemaPreviewPane.vue` uses `:deep(...)` and CSS container queries to adjust Kong renderer
   layout inside a split pane.
 - Share URLs use the exact prefix `#schema/`; changing it breaks existing links unless a
