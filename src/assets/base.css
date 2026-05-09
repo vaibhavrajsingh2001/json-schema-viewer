@@ -16,16 +16,61 @@
   /* Schema Renderer overrides */
   --kui-color-background: var(--color-secondary);
   --kui-color-background-neutral-weakest: #f8fafc;
-
-  /* Third party overrides */
-  --jse-theme-color: #0284c7;
-  --jse-background-color: transparent;
-  --jse-panel-background: transparent;
-  --jse-selection-background-inactive-color: #ffdd88;
-  --jse-font-family: var(--font-sans);
-  --jse-font-family-mono: var(--font-mono);
   --kui-font-family-text: var(--font-sans);
   --kui-font-family-code: var(--font-mono);
+
+  /* Visual JSON editor overrides */
+  --theme-json-bg: #f8fafc;
+  --theme-json-bg-panel: #ffffff;
+  --theme-json-bg-hover: #e8eef3;
+  --theme-json-bg-selected: #2a6f97;
+  --theme-json-bg-selected-muted: #d8e8f0;
+  --theme-json-bg-match: #f7e7b8;
+  --theme-json-bg-match-active: #f1c96b;
+  --theme-json-border: #c8d3dc;
+  --theme-json-border-subtle: #e2e8ef;
+  --theme-json-text: #132f3a;
+  --theme-json-text-selected: #ffffff;
+  --theme-json-text-muted: #5d7180;
+  --theme-json-text-dim: #748592;
+  --theme-json-text-dimmer: #94a3ad;
+  --theme-json-string: #a64600;
+  --theme-json-number: #2f7d32;
+  --theme-json-boolean: #0066a6;
+  --theme-json-accent: #2a6f97;
+  --theme-json-accent-muted: #cfe5ef;
+  --theme-json-input-bg: #ffffff;
+  --theme-json-input-border: #b8c7d2;
+  --theme-json-error: #b42318;
+  --theme-json-input-font-size: 13px;
+}
+
+[data-vj-root] {
+  /* Visual JSON writes default theme values inline, so these overrides need priority. */
+  --vj-bg: var(--theme-json-bg) !important;
+  --vj-bg-panel: var(--theme-json-bg-panel) !important;
+  --vj-bg-hover: var(--theme-json-bg-hover) !important;
+  --vj-bg-selected: var(--theme-json-bg-selected) !important;
+  --vj-bg-selected-muted: var(--theme-json-bg-selected-muted) !important;
+  --vj-bg-match: var(--theme-json-bg-match) !important;
+  --vj-bg-match-active: var(--theme-json-bg-match-active) !important;
+  --vj-border: var(--theme-json-border) !important;
+  --vj-border-subtle: var(--theme-json-border-subtle) !important;
+  --vj-text: var(--theme-json-text) !important;
+  --vj-text-selected: var(--theme-json-text-selected) !important;
+  --vj-text-muted: var(--theme-json-text-muted) !important;
+  --vj-text-dim: var(--theme-json-text-dim) !important;
+  --vj-text-dimmer: var(--theme-json-text-dimmer) !important;
+  --vj-string: var(--theme-json-string) !important;
+  --vj-number: var(--theme-json-number) !important;
+  --vj-boolean: var(--theme-json-boolean) !important;
+  --vj-accent: var(--theme-json-accent) !important;
+  --vj-accent-muted: var(--theme-json-accent-muted) !important;
+  --vj-input-bg: var(--theme-json-input-bg) !important;
+  --vj-input-border: var(--theme-json-input-border) !important;
+  --vj-error: var(--theme-json-error) !important;
+  --vj-font: var(--font-mono) !important;
+  --vj-input-font-size: var(--theme-json-input-font-size) !important;
 }
 
 *,
@@ -34,6 +79,19 @@
   box-sizing: border-box;
   margin: 0;
   font-weight: normal;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono);
 }
 
 body {
@@ -67,5 +125,21 @@ button {
 
   &:active {
     transform: translateY(0);
+  }
+}
+
+.pane-action-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
+  background: var(--color-primary);
+  color: var(--color-white);
+  opacity: 0.85;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+
+  &:hover {
+    opacity: 1;
+    background: var(--color-primary-hover);
   }
 }

@@ -35,9 +35,8 @@ function handleShare() {
   padding: 0 1rem;
 
   h1 {
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 700;
-    letter-spacing: -0.5px;
     margin: 0;
   }
 }
