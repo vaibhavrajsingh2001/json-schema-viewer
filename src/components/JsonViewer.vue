@@ -1,7 +1,7 @@
 <template>
   <Splitpanes class="container">
     <Pane :size="editorSize" min-size="0">
-      <JsonEditorPane :value="jsonContent" @change="jsonContent = $event" />
+      <JsonEditorPane v-model="jsonContent" />
     </Pane>
     <Pane :size="100 - editorSize">
       <SchemaPreviewPane :schema="renderableSchema" :editor-collapsed="editorCollapsed" @toggle-editor="toggleEditor" />

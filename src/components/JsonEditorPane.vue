@@ -9,7 +9,7 @@
     </button>
     <JsonEditor
       class="json-editor"
-      :value="value"
+      :value="modelValue"
       height="100%"
       width="100%"
       :sidebar-open="sidebarOpen"
@@ -17,7 +17,7 @@
       :tree-show-counts="true"
       :editor-show-descriptions="true"
       :editor-show-counts="true"
-      @change="$emit('change', $event)"
+      @change="$emit('update:modelValue', $event)"
     />
   </div>
 </template>
@@ -27,11 +27,11 @@ import { ref } from 'vue'
 import { JsonEditor, type JsonValue } from '@visual-json/vue'
 
 defineProps<{
-  value: JsonValue
+  modelValue: JsonValue
 }>()
 
 defineEmits<{
-  change: [value: JsonValue]
+  'update:modelValue': [value: JsonValue]
 }>()
 
 // Visual JSON hides the tree/form sidepanel when this is false; keep editing focused by default.
