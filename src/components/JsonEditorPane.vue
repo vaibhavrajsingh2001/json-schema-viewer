@@ -6,16 +6,13 @@
       @toggle="sidebarOpen = !sidebarOpen"
     />
     <JsonEditor
-      class="json-editor"
-      :value="modelValue"
-      height="100%"
-      width="100%"
+      :value="json"
       :sidebar-open="sidebarOpen"
-      :tree-show-values="true"
-      :tree-show-counts="true"
-      :editor-show-descriptions="true"
-      :editor-show-counts="true"
-      @change="$emit('update:modelValue', $event)"
+      tree-show-values
+      tree-show-counts
+      editor-show-descriptions
+      editor-show-counts
+      @change="json = $event"
     />
   </div>
 </template>
@@ -25,16 +22,10 @@ import { ref } from 'vue'
 import { JsonEditor, type JsonValue } from '@visual-json/vue'
 import PaneToggleButton from '@/components/PaneToggleButton.vue'
 
-defineProps<{
-  modelValue: JsonValue
-}>()
+const json = defineModel<JsonValue>({ required: true })
 
-defineEmits<{
-  'update:modelValue': [value: JsonValue]
-}>()
-
-// Visual JSON hides the tree/form sidepanel when this is false; keep editing focused by default.
-const sidebarOpen = ref(false)
+// Visual JSON exposes sidebar visibility as a prop, but does not render its own toggle.
+const sidebarOpen = ref<boolean>(false)
 </script>
 
 <style scoped>
