@@ -40,17 +40,17 @@ const toggleIcon = computed(() => (props.collapsed ? IconPanelLeftOpen : IconPan
   top: 0.5rem;
   right: 0.5rem;
   z-index: 10;
-  background: var(--color-primary);
-  color: var(--color-white);
+  background: var(--color-app-primary);
+  color: var(--color-app-on-primary);
   opacity: 0.85;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-app-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
   &:hover {
     opacity: 1;
-    background: var(--color-primary-hover);
+    background: var(--color-app-primary-hover);
   }
 }
 

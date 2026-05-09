@@ -20,15 +20,15 @@ const { isVisible, message } = useToast()
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--color-primary);
-  color: var(--color-white);
+  background: var(--color-app-primary);
+  color: var(--color-app-on-primary);
   padding: 0.6rem 1.4rem;
   border-radius: 20px;
   font-size: 0.95rem;
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-app-md);
   z-index: 1000;
   pointer-events: none;
 

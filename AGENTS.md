@@ -45,17 +45,20 @@ Notes:
 ## Code Map
 
 - `src/main.ts`: app bootstrap and global stylesheet imports.
-- `src/App.vue`: top navigation, share button, top-level `JsonViewer`, and toast mount.
+- `src/App.vue`: top navigation, theme picker, share button, top-level `JsonViewer`, and toast mount.
 - `src/components/JsonViewer.vue`: main coordinator for editor state, split panes,
   schema renderability checks, editor collapse behavior, and exposing `share()`.
 - `src/components/JsonEditorPane.vue`: wraps `@visual-json/vue`'s `JsonEditor`.
 - `src/components/SchemaPreviewPane.vue`: wraps Kong's `SchemaRenderer`.
 - `src/components/PaneToggleButton.vue`: reusable absolute-positioned pane toggle.
+- `src/components/ThemePicker.vue`: theme selection UI wired to `useTheme`.
 - `src/components/ToastNotification.vue`: global toast UI.
 - `src/composables/useShareableJson.ts`: owns editable JSON state and share-link behavior.
+- `src/composables/useTheme.ts`: owns selected theme state, applies `data-theme`, and persists it.
 - `src/composables/useToast.ts`: module-level singleton toast state.
 - `src/utils/share.ts`: encode/decode helpers for `#schema/` URLs.
-- `src/assets/base.css`: design tokens, resets, Visual JSON and Kong renderer overrides.
+- `src/assets/themes.css`: raw theme primitive color tokens and theme variants.
+- `src/assets/base.css`: semantic tokens, resets, Visual JSON and Kong renderer overrides.
 - `src/assets/main.css`: global imports plus split pane splitter styling.
 - `src/assets/sample-schema.json`: initial schema when no valid URL hash is present.
 - `vite.config.ts`: Vite plugins, `@` alias, font/icon loading, and build externals.
@@ -82,6 +85,10 @@ Notes:
 - Guard calls into `SchemaRenderer`: it should receive `Record<string, unknown> | null`,
   not arrays, primitives, or undefined.
 - Styling is mostly CSS variables in `src/assets/base.css` plus scoped component styles.
+- Add or tune themes by changing theme primitive tokens in `src/assets/themes.css` and adding
+  the theme id to `src/composables/useTheme.ts`.
+- Components should use semantic app tokens like `--color-app-bg`, `--color-app-surface`,
+  `--color-app-text`, and `--color-app-accent` rather than raw theme primitive tokens.
 - Global third-party theme overrides live in `base.css`; component-specific overrides should
   stay close to the relevant component.
 - The app uses nested CSS syntax in Vue scoped styles and global CSS.
@@ -89,6 +96,8 @@ Notes:
   collection package in `devDependencies`.
 - Size icons compositionally with the global `.app-icon` utility and `font-size`; avoid
   hardcoded SVG `width`/`height` unless an icon genuinely needs a one-off override.
+- Add JSDoc for exported functions, composables, types, and non-obvious helpers; add concise
+  inline comments where logic is complex or integration behavior is surprising.
 - Keep comments sparse and useful; existing comments explain integration quirks.
 
 ## Build And Integration Gotchas

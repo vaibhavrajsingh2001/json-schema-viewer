@@ -1,11 +1,4 @@
 :root {
-  /* Palette */
-  --color-primary: #003049;
-  --color-primary-hover: #00496e;
-  --color-secondary: #f1f5f9;
-  --color-white: #ffffff;
-  --color-black: #000000;
-
   /* Layout */
   --navbar-height: 5vh;
 
@@ -13,35 +6,70 @@
   --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
 
-  /* Schema Renderer overrides */
-  --kui-color-background: var(--color-secondary);
-  --kui-color-background-neutral-weakest: #f8fafc;
+  /* Semantic app tokens: components should use these instead of palette values. */
+  --color-app-bg: var(--theme-surface-canvas);
+  --color-app-surface: var(--theme-surface-panel);
+  --color-app-surface-raised: var(--theme-surface-raised);
+  --color-app-surface-hover: var(--theme-surface-hover);
+  --color-app-border: var(--theme-border);
+  --color-app-border-subtle: var(--theme-border-subtle);
+  --color-app-text: var(--theme-text);
+  --color-app-text-muted: var(--theme-text-muted);
+  --color-app-text-subtle: var(--theme-text-subtle);
+  --color-app-primary: var(--theme-primary-strong);
+  --color-app-primary-hover: var(--theme-primary-hover);
+  --color-app-accent: var(--theme-primary);
+  --color-app-accent-soft: var(--theme-primary-soft);
+  --color-app-on-primary: var(--theme-on-primary);
+  --shadow-app-sm: 0 1px 4px rgb(var(--theme-shadow-rgb) / 0.2);
+  --shadow-app-md: 0 4px 12px rgb(var(--theme-shadow-rgb) / 0.2);
+  --shadow-app-inset: 0 0 5px rgb(var(--theme-shadow-rgb) / 0.2) inset;
+
+  /* Backwards-compatible aliases while components migrate to semantic tokens. */
+  --color-primary: var(--color-app-primary);
+  --color-primary-hover: var(--color-app-primary-hover);
+  --color-secondary: var(--color-app-bg);
+  --color-white: var(--color-app-on-primary);
+  --color-black: var(--color-app-text);
+
+  /* Schema Renderer theme bridge */
+  --kui-color-background: var(--color-app-bg);
+  --kui-color-background-neutral-weakest: var(--color-app-surface-raised);
+  --kui-color-background-neutral-weak: var(--color-app-surface-hover);
+  --kui-color-background-primary-weakest: var(--color-app-accent-soft);
+  --kui-color-border: var(--color-app-border);
+  --kui-color-border-neutral-weak: var(--color-app-border-subtle);
+  --kui-color-text: var(--color-app-text);
+  --kui-color-text-neutral: var(--color-app-text);
+  --kui-color-text-neutral-strong: var(--color-app-text);
+  --kui-color-text-neutral-weak: var(--color-app-text-muted);
+  --kui-color-text-primary: var(--color-app-accent);
   --kui-font-family-text: var(--font-sans);
   --kui-font-family-code: var(--font-mono);
 
-  /* Visual JSON editor overrides */
-  --theme-json-bg: #f8fafc;
-  --theme-json-bg-panel: #ffffff;
-  --theme-json-bg-hover: #e8eef3;
-  --theme-json-bg-selected: #2a6f97;
-  --theme-json-bg-selected-muted: #d8e8f0;
-  --theme-json-bg-match: #f7e7b8;
-  --theme-json-bg-match-active: #f1c96b;
-  --theme-json-border: #c8d3dc;
-  --theme-json-border-subtle: #e2e8ef;
-  --theme-json-text: #132f3a;
-  --theme-json-text-selected: #ffffff;
-  --theme-json-text-muted: #5d7180;
-  --theme-json-text-dim: #748592;
-  --theme-json-text-dimmer: #94a3ad;
-  --theme-json-string: #a64600;
-  --theme-json-number: #2f7d32;
-  --theme-json-boolean: #0066a6;
-  --theme-json-accent: #2a6f97;
-  --theme-json-accent-muted: #cfe5ef;
-  --theme-json-input-bg: #ffffff;
-  --theme-json-input-border: #b8c7d2;
-  --theme-json-error: #b42318;
+  /* Visual JSON editor theme bridge */
+  --theme-json-bg: var(--color-app-surface-raised);
+  --theme-json-bg-panel: var(--color-app-surface);
+  --theme-json-bg-hover: var(--color-app-surface-hover);
+  --theme-json-bg-selected: var(--color-app-accent);
+  --theme-json-bg-selected-muted: var(--color-app-accent-soft);
+  --theme-json-bg-match: var(--theme-warning-soft);
+  --theme-json-bg-match-active: var(--theme-warning);
+  --theme-json-border: var(--color-app-border);
+  --theme-json-border-subtle: var(--color-app-border-subtle);
+  --theme-json-text: var(--color-app-text);
+  --theme-json-text-selected: var(--theme-on-accent);
+  --theme-json-text-muted: var(--color-app-text-muted);
+  --theme-json-text-dim: var(--color-app-text-subtle);
+  --theme-json-text-dimmer: var(--color-app-text-subtle);
+  --theme-json-string: var(--theme-code-string);
+  --theme-json-number: var(--theme-code-number);
+  --theme-json-boolean: var(--theme-code-boolean);
+  --theme-json-accent: var(--color-app-accent);
+  --theme-json-accent-muted: var(--color-app-accent-soft);
+  --theme-json-input-bg: var(--color-app-surface);
+  --theme-json-input-border: var(--color-app-border);
+  --theme-json-error: var(--theme-error);
   --theme-json-input-font-size: 13px;
 }
 
@@ -95,6 +123,8 @@ samp {
 }
 
 body {
+  background: var(--color-app-bg);
+  color: var(--color-app-text);
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.4rem;
@@ -121,6 +151,8 @@ button {
   padding: 0;
   transition:
     background 0.2s,
+    border-color 0.2s,
+    color 0.2s,
     opacity 0.2s,
     transform 0.2s,
     box-shadow 0.2s;

@@ -44,7 +44,7 @@ const renderableSchema = computed<Record<string, unknown> | null>(() => {
 })
 
 defineExpose({
-  share
+  share,
 })
 
 const editorCollapsed = ref(false)
@@ -58,13 +58,13 @@ function toggleEditor() {
 <style scoped>
 .container {
   &.splitpanes {
-    background: var(--color-secondary);
+    background: var(--color-app-bg);
   }
 
   .splitpanes__pane {
     width: 100%;
     overflow: auto;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2) inset;
+    box-shadow: var(--shadow-app-inset);
   }
 }
 </style>

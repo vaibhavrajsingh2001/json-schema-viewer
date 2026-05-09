@@ -1,0 +1,90 @@
+/*
+ * Theme primitives.
+ *
+ * Add new app themes here using `:root[data-theme='<id>']`, then expose the id in
+ * `src/composables/useTheme.ts`. Components should consume semantic tokens from
+ * `base.css` instead of these raw primitive tokens directly.
+ */
+:root {
+  color-scheme: light;
+  --theme-primary-strong: #003049;
+  --theme-primary: #2a6f97;
+  --theme-primary-hover: #00496e;
+  --theme-primary-soft: #cfe5ef;
+  --theme-surface-canvas: #f1f5f9;
+  --theme-surface-panel: #ffffff;
+  --theme-surface-raised: #f8fafc;
+  --theme-surface-hover: #e8eef3;
+  --theme-border: #c8d3dc;
+  --theme-border-subtle: #e2e8ef;
+  --theme-text: #132f3a;
+  --theme-text-muted: #5d7180;
+  --theme-text-subtle: #748592;
+  --theme-on-primary: #ffffff;
+  --theme-on-accent: #ffffff;
+  --theme-shadow-rgb: 0 0 0;
+  --theme-success: #2f7d32;
+  --theme-info: #0066a6;
+  --theme-warning-soft: #f7e7b8;
+  --theme-warning: #f1c96b;
+  --theme-error: #b42318;
+  --theme-code-string: #a64600;
+  --theme-code-number: #2f7d32;
+  --theme-code-boolean: #0066a6;
+}
+
+:root[data-theme='midnight'] {
+  color-scheme: dark;
+  --theme-primary-strong: #111827;
+  --theme-primary: #60a5fa;
+  --theme-primary-hover: #1f2937;
+  --theme-primary-soft: #1e3a5f;
+  --theme-surface-canvas: #0b1120;
+  --theme-surface-panel: #111827;
+  --theme-surface-raised: #162033;
+  --theme-surface-hover: #1f2a44;
+  --theme-border: #334155;
+  --theme-border-subtle: #243244;
+  --theme-text: #e5eefb;
+  --theme-text-muted: #a8b4c7;
+  --theme-text-subtle: #7f8ea3;
+  --theme-on-primary: #f8fafc;
+  --theme-on-accent: #08111f;
+  --theme-shadow-rgb: 0 0 0;
+  --theme-success: #86efac;
+  --theme-info: #93c5fd;
+  --theme-warning-soft: #473a19;
+  --theme-warning: #fbbf24;
+  --theme-error: #f87171;
+  --theme-code-string: #fbbf24;
+  --theme-code-number: #86efac;
+  --theme-code-boolean: #93c5fd;
+}
+
+:root[data-theme='forest'] {
+  color-scheme: light;
+  --theme-primary-strong: #12372a;
+  --theme-primary: #2f7d5c;
+  --theme-primary-hover: #1f5a43;
+  --theme-primary-soft: #d7eadf;
+  --theme-surface-canvas: #f3f7ef;
+  --theme-surface-panel: #fffdf5;
+  --theme-surface-raised: #fbf8ec;
+  --theme-surface-hover: #e7efe2;
+  --theme-border: #cbd8c2;
+  --theme-border-subtle: #dde7d6;
+  --theme-text: #1d2f25;
+  --theme-text-muted: #5f6f63;
+  --theme-text-subtle: #7a8b7b;
+  --theme-on-primary: #fffdf5;
+  --theme-on-accent: #fffdf5;
+  --theme-shadow-rgb: 18 55 42;
+  --theme-success: #2f7d32;
+  --theme-info: #256d85;
+  --theme-warning-soft: #f3e5b5;
+  --theme-warning: #d7a83f;
+  --theme-error: #b42318;
+  --theme-code-string: #9a5a13;
+  --theme-code-number: #2f7d32;
+  --theme-code-boolean: #256d85;
+}
