@@ -1,27 +1,49 @@
 <template>
   <Splitpanes class="container">
     <Pane :size="editorSize" min-size="0">
-      <JsonEditorVue v-model="jsonContent" :stringified="false" :navigation-bar="false" />
+      <JsonEditor
+        class="json-editor"
+        :value="jsonContent"
+        height="100%"
+        width="100%"
+        :sidebar-open="true"
+        :tree-show-values="true"
+        :tree-show-counts="true"
+        :editor-show-descriptions="true"
+        :editor-show-counts="true"
+        @change="jsonContent = $event"
+      />
     </Pane>
     <Pane :size="100 - editorSize" class="schema-pane">
       <button class="collapse-btn" :title="editorCollapsed ? 'Show editor' : 'Hide editor'" @click="toggleEditor">
         {{ editorCollapsed ? '↦' : '↤' }}
       </button>
-      <SchemaRenderer v-if="jsonContent" :schema="jsonContent" />
+      <SchemaRenderer v-if="renderableSchema" :schema="renderableSchema" />
     </Pane>
   </Splitpanes>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed, shallowRef, onMounted } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import { SchemaRenderer } from '@kong/spec-renderer'
-import JsonEditorVue from 'json-editor-vue'
+import { JsonEditor, type JsonValue } from '@visual-json/vue'
 import sampleSchema from '@/assets/sample-schema.json' with { type: 'json' }
 import { encodeSchema, decodeSchema } from '@/utils/share'
 import { useToast } from '@/composables/useToast'
 
-const jsonContent = ref<Record<string, unknown>>(sampleSchema)
+const jsonContent = shallowRef<JsonValue>(sampleSchema as JsonValue)
+
+const renderableSchema = computed<Record<string, unknown> | null>(() => {
+  const value = jsonContent.value
+
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  return value as Record<string, unknown>
+})
+
 const { show: showToast } = useToast()
 
 function loadFromUrl() {
@@ -68,7 +90,33 @@ function toggleEditor() {
   }
 
   .splitpanes__pane {
+    width: 100%;
     overflow: auto;
+    --vj-bg: #f8fafc;
+    --vj-bg-panel: #ffffff;
+    --vj-bg-hover: #e8eef3;
+    --vj-bg-selected: #2a6f97;
+    --vj-bg-selected-muted: #d8e8f0;
+    --vj-bg-match: #f7e7b8;
+    --vj-bg-match-active: #f1c96b;
+    --vj-border: #c8d3dc;
+    --vj-border-subtle: #e2e8ef;
+    --vj-text: #132f3a;
+    --vj-text-selected: #ffffff;
+    --vj-text-muted: #5d7180;
+    --vj-text-dim: #748592;
+    --vj-text-dimmer: #94a3ad;
+    --vj-string: #a64600;
+    --vj-number: #2f7d32;
+    --vj-boolean: #0066a6;
+    --vj-accent: #2a6f97;
+    --vj-accent-muted: #cfe5ef;
+    --vj-input-bg: #ffffff;
+    --vj-input-border: #b8c7d2;
+    --vj-error: #b42318;
+    --vj-font:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --vj-input-font-size: 13px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2) inset;
   }
 
