@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import Unfonts from 'unplugin-fonts/vite'
+import Icons from 'unplugin-icons/vite'
 
 // !Important: always externalize `shiki/onig.wasm`
 const externalDependencies: string[] = ['shiki/onig.wasm']
@@ -28,6 +29,10 @@ export default defineConfig({
           },
         ],
       },
+    }),
+    Icons({
+      compiler: 'vue3',
+      scale: 1,
     }),
   ],
   resolve: {

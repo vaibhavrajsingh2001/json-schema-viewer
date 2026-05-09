@@ -1,56 +1,50 @@
 <template>
   <Splitpanes class="container">
     <Pane :size="editorSize" min-size="0">
-      <JsonEditorVue v-model="jsonContent" :stringified="false" :navigation-bar="false" />
+      <JsonEditorPane v-model="jsonContent" />
     </Pane>
-    <Pane :size="100 - editorSize" class="schema-pane">
-      <button class="collapse-btn" :title="editorCollapsed ? 'Show editor' : 'Hide editor'" @click="toggleEditor">
-        {{ editorCollapsed ? '↦' : '↤' }}
-      </button>
-      <SchemaRenderer v-if="jsonContent" :schema="jsonContent" />
+    <Pane :size="100 - editorSize">
+      <SchemaPreviewPane :schema="renderableSchema">
+        <template #actions>
+          <PaneToggleButton
+            :collapsed="editorCollapsed"
+            :title="editorCollapsed ? 'Show editor' : 'Hide editor'"
+            size="lg"
+            @toggle="toggleEditor"
+          />
+        </template>
+      </SchemaPreviewPane>
     </Pane>
   </Splitpanes>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
-import { SchemaRenderer } from '@kong/spec-renderer'
-import JsonEditorVue from 'json-editor-vue'
+import type { JsonValue } from '@visual-json/vue'
 import sampleSchema from '@/assets/sample-schema.json' with { type: 'json' }
-import { encodeSchema, decodeSchema } from '@/utils/share'
 import { useToast } from '@/composables/useToast'
+import { useShareableJson } from '@/composables/useShareableJson'
+import JsonEditorPane from '@/components/JsonEditorPane.vue'
+import SchemaPreviewPane from '@/components/SchemaPreviewPane.vue'
+import PaneToggleButton from '@/components/PaneToggleButton.vue'
 
-const jsonContent = ref<Record<string, unknown>>(sampleSchema)
 const { show: showToast } = useToast()
+const { jsonContent, share } = useShareableJson(sampleSchema as JsonValue, showToast)
 
-function loadFromUrl() {
-  const hash = window.location.hash
-  const decoded = decodeSchema(hash)
-  if (decoded) {
-    jsonContent.value = decoded
+const renderableSchema = computed<Record<string, unknown> | null>(() => {
+  const value = jsonContent.value
+
+  // Kong's renderer expects an object schema, while the editor can emit any JSON root.
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
   }
-}
 
-async function share() {
-  const hash = encodeSchema(jsonContent.value)
-  const url = `${window.location.origin}${window.location.pathname}${hash}`
-
-  try {
-    await navigator.clipboard.writeText(url)
-    showToast('Copied to clipboard!')
-    window.history.replaceState(null, '', hash)
-  } catch (err) {
-    console.error('Failed to copy to clipboard', err)
-  }
-}
-
-onMounted(() => {
-  loadFromUrl()
+  return value as Record<string, unknown>
 })
 
 defineExpose({
-  share
+  share,
 })
 
 const editorCollapsed = ref(false)
@@ -64,47 +58,13 @@ function toggleEditor() {
 <style scoped>
 .container {
   &.splitpanes {
-    background: var(--color-secondary);
+    background: var(--color-app-bg);
   }
 
   .splitpanes__pane {
+    width: 100%;
     overflow: auto;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2) inset;
-  }
-
-  .schema-pane {
-    padding: 1rem 1.4rem;
-    container-type: inline-size;
-    position: relative;
-
-    .collapse-btn {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      z-index: 10;
-      background: var(--color-primary);
-      color: var(--color-white);
-      font-size: 2rem;
-      padding: 0.2rem 0.6rem 0.35rem 0.6rem;
-      line-height: 0.8;
-      opacity: 0.85;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-
-      &:hover {
-        opacity: 1;
-        background: var(--color-primary-hover);
-      }
-    }
-
-    :deep(.model-example-visible) {
-      grid-template-columns: 1fr;
-    }
-
-    @container (min-width: 900px) {
-      :deep(.model-example-visible) {
-        grid-template-columns: auto clamp(410px, 40%, 575px);
-      }
-    }
+    box-shadow: var(--shadow-app-inset);
   }
 }
 </style>

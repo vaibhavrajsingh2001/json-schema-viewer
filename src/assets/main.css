@@ -1,6 +1,12 @@
+@import './themes.css';
 @import './base.css';
 
 .splitpanes__splitter {
   min-width: 2px !important;
-  background-color: var(--color-black);
+  background-color: var(--color-app-border);
+  transition: background-color 0.2s;
+}
+
+.splitpanes__splitter:hover {
+  background-color: var(--color-app-accent);
 }

@@ -1,11 +1,4 @@
 :root {
-  /* Palette */
-  --color-primary: #003049;
-  --color-primary-hover: #00496e;
-  --color-secondary: #f1f5f9;
-  --color-white: #ffffff;
-  --color-black: #000000;
-
   /* Layout */
   --navbar-height: 5vh;
 
@@ -13,19 +6,99 @@
   --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
 
-  /* Schema Renderer overrides */
-  --kui-color-background: var(--color-secondary);
-  --kui-color-background-neutral-weakest: #f8fafc;
+  /* Semantic app tokens: components should use these instead of palette values. */
+  --color-app-bg: var(--theme-surface-canvas);
+  --color-app-surface: var(--theme-surface-panel);
+  --color-app-surface-raised: var(--theme-surface-raised);
+  --color-app-surface-hover: var(--theme-surface-hover);
+  --color-app-border: var(--theme-border);
+  --color-app-border-subtle: var(--theme-border-subtle);
+  --color-app-text: var(--theme-text);
+  --color-app-text-muted: var(--theme-text-muted);
+  --color-app-text-subtle: var(--theme-text-subtle);
+  --color-app-primary: var(--theme-primary-strong);
+  --color-app-primary-hover: var(--theme-primary-hover);
+  --color-app-accent: var(--theme-primary);
+  --color-app-accent-soft: var(--theme-primary-soft);
+  --color-app-on-primary: var(--theme-on-primary);
+  --shadow-app-sm: 0 1px 4px rgb(var(--theme-shadow-rgb) / 0.2);
+  --shadow-app-md: 0 4px 12px rgb(var(--theme-shadow-rgb) / 0.2);
+  --shadow-app-inset: 0 0 5px rgb(var(--theme-shadow-rgb) / 0.2) inset;
 
-  /* Third party overrides */
-  --jse-theme-color: #0284c7;
-  --jse-background-color: transparent;
-  --jse-panel-background: transparent;
-  --jse-selection-background-inactive-color: #ffdd88;
-  --jse-font-family: var(--font-sans);
-  --jse-font-family-mono: var(--font-mono);
+  /* Backwards-compatible aliases while components migrate to semantic tokens. */
+  --color-primary: var(--color-app-primary);
+  --color-primary-hover: var(--color-app-primary-hover);
+  --color-secondary: var(--color-app-bg);
+  --color-white: var(--color-app-on-primary);
+  --color-black: var(--color-app-text);
+
+  /* Schema Renderer theme bridge */
+  --kui-color-background: var(--color-app-bg);
+  --kui-color-background-neutral-weakest: var(--color-app-surface-raised);
+  --kui-color-background-neutral-weak: var(--color-app-surface-hover);
+  --kui-color-background-primary-weakest: var(--color-app-accent-soft);
+  --kui-color-border: var(--color-app-border);
+  --kui-color-border-neutral-weak: var(--color-app-border-subtle);
+  --kui-color-text: var(--color-app-text);
+  --kui-color-text-neutral: var(--color-app-text);
+  --kui-color-text-neutral-strong: var(--color-app-text);
+  --kui-color-text-neutral-weak: var(--color-app-text-muted);
+  --kui-color-text-primary: var(--color-app-accent);
   --kui-font-family-text: var(--font-sans);
   --kui-font-family-code: var(--font-mono);
+
+  /* Visual JSON editor theme bridge */
+  --theme-json-bg: var(--color-app-surface-raised);
+  --theme-json-bg-panel: var(--color-app-surface);
+  --theme-json-bg-hover: var(--color-app-surface-hover);
+  --theme-json-bg-selected: var(--color-app-accent);
+  --theme-json-bg-selected-muted: var(--color-app-accent-soft);
+  --theme-json-bg-match: var(--theme-warning-soft);
+  --theme-json-bg-match-active: var(--theme-warning);
+  --theme-json-border: var(--color-app-border);
+  --theme-json-border-subtle: var(--color-app-border-subtle);
+  --theme-json-text: var(--color-app-text);
+  --theme-json-text-selected: var(--theme-on-accent);
+  --theme-json-text-muted: var(--color-app-text-muted);
+  --theme-json-text-dim: var(--color-app-text-subtle);
+  --theme-json-text-dimmer: var(--color-app-text-subtle);
+  --theme-json-string: var(--theme-code-string);
+  --theme-json-number: var(--theme-code-number);
+  --theme-json-boolean: var(--theme-code-boolean);
+  --theme-json-accent: var(--color-app-accent);
+  --theme-json-accent-muted: var(--color-app-accent-soft);
+  --theme-json-input-bg: var(--color-app-surface);
+  --theme-json-input-border: var(--color-app-border);
+  --theme-json-error: var(--theme-error);
+  --theme-json-input-font-size: 13px;
+}
+
+[data-vj-root] {
+  /* Visual JSON writes default theme values inline, so these overrides need priority. */
+  --vj-bg: var(--theme-json-bg) !important;
+  --vj-bg-panel: var(--theme-json-bg-panel) !important;
+  --vj-bg-hover: var(--theme-json-bg-hover) !important;
+  --vj-bg-selected: var(--theme-json-bg-selected) !important;
+  --vj-bg-selected-muted: var(--theme-json-bg-selected-muted) !important;
+  --vj-bg-match: var(--theme-json-bg-match) !important;
+  --vj-bg-match-active: var(--theme-json-bg-match-active) !important;
+  --vj-border: var(--theme-json-border) !important;
+  --vj-border-subtle: var(--theme-json-border-subtle) !important;
+  --vj-text: var(--theme-json-text) !important;
+  --vj-text-selected: var(--theme-json-text-selected) !important;
+  --vj-text-muted: var(--theme-json-text-muted) !important;
+  --vj-text-dim: var(--theme-json-text-dim) !important;
+  --vj-text-dimmer: var(--theme-json-text-dimmer) !important;
+  --vj-string: var(--theme-json-string) !important;
+  --vj-number: var(--theme-json-number) !important;
+  --vj-boolean: var(--theme-json-boolean) !important;
+  --vj-accent: var(--theme-json-accent) !important;
+  --vj-accent-muted: var(--theme-json-accent-muted) !important;
+  --vj-input-bg: var(--theme-json-input-bg) !important;
+  --vj-input-border: var(--theme-json-input-border) !important;
+  --vj-error: var(--theme-json-error) !important;
+  --vj-font: var(--font-mono) !important;
+  --vj-input-font-size: var(--theme-json-input-font-size) !important;
 }
 
 *,
@@ -36,13 +109,34 @@
   font-weight: normal;
 }
 
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono);
+}
+
 body {
+  background: var(--color-app-bg);
+  color: var(--color-app-text);
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.4rem;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.app-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: -0.125em;
 }
 
 button {
@@ -57,6 +151,8 @@ button {
   padding: 0;
   transition:
     background 0.2s,
+    border-color 0.2s,
+    color 0.2s,
     opacity 0.2s,
     transform 0.2s,
     box-shadow 0.2s;

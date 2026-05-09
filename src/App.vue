@@ -1,9 +1,13 @@
 <template>
   <nav class="navbar">
     <h1>JSON Schema Viewer</h1>
-    <button class="share-btn" title="Copy share link" @click="handleShare">
-      🔗 Share
-    </button>
+    <div class="navbar-actions">
+      <ThemePicker />
+      <button class="share-btn" title="Copy share link" @click="handleShare">
+        <IconShare2 class="app-icon" aria-hidden="true" />
+        <span>Share</span>
+      </button>
+    </div>
   </nav>
 
   <main class="main">
@@ -15,7 +19,9 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import JsonViewer from './components/JsonViewer.vue'
+import ThemePicker from './components/ThemePicker.vue'
 import ToastNotification from './components/ToastNotification.vue'
+import IconShare2 from '~icons/lucide/share-2'
 
 const jsonViewerRef = useTemplateRef('jsonViewerRef')
 
@@ -29,32 +35,42 @@ function handleShare() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: var(--color-primary);
-  color: var(--color-secondary);
+  background-color: var(--color-app-primary);
+  color: var(--color-app-on-primary);
   height: var(--navbar-height);
   padding: 0 1rem;
 
   h1 {
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-sans);
     font-weight: 700;
-    letter-spacing: -0.5px;
     margin: 0;
   }
 }
 
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .share-btn {
-  background: var(--color-secondary);
-  color: var(--color-primary);
+  background: var(--color-app-surface);
+  color: var(--color-app-primary);
   padding: 0.3rem 0.8rem;
   font-size: 0.9rem;
   height: 32px;
   display: flex;
   align-items: center;
+  gap: 0.35rem;
   font-weight: 500;
 
+  .app-icon {
+    font-size: 1rem;
+  }
+
   &:hover {
-    background: var(--color-white);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: var(--color-app-surface-raised);
+    box-shadow: var(--shadow-app-sm);
   }
 }
 

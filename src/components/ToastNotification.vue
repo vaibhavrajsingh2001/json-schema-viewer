@@ -1,11 +1,15 @@
 <template>
   <Transition name="fade">
-    <span v-if="isVisible" class="toast">{{ message }}</span>
+    <span v-if="isVisible" class="toast">
+      <IconCircleCheck class="app-icon" aria-hidden="true" />
+      <span>{{ message }}</span>
+    </span>
   </Transition>
 </template>
 
 <script setup lang="ts">
 import { useToast } from '@/composables/useToast'
+import IconCircleCheck from '~icons/lucide/circle-check'
 
 const { isVisible, message } = useToast()
 </script>
@@ -16,19 +20,28 @@ const { isVisible, message } = useToast()
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--color-primary);
-  color: var(--color-white);
+  background: var(--color-app-primary);
+  color: var(--color-app-on-primary);
   padding: 0.6rem 1.4rem;
   border-radius: 20px;
   font-size: 0.95rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  box-shadow: var(--shadow-app-md);
   z-index: 1000;
   pointer-events: none;
+
+  .app-icon {
+    font-size: 1rem;
+  }
 }
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
 }
 
 .fade-enter-from,
