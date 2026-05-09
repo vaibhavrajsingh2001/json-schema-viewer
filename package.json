@@ -13,12 +13,18 @@
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "lint:eslint": "eslint . --fix",
     "lint": "run-s lint:*",
-    "format": "prettier --write src/"
+    "lint:check": "run-s lint:check:*",
+    "lint:check:oxlint": "oxlint . -D correctness --ignore-path .gitignore",
+    "lint:check:eslint": "eslint .",
+    "format": "prettier --write src/",
+    "format:check": "prettier --check src/"
   },
   "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
     "@kong/spec-renderer": "^1.107.15",
     "@visual-json/core": "^0.3.1",
     "@visual-json/vue": "^0.3.1",
+    "@vueuse/core": "^14.3.0",
     "lz-string": "^1.5.0",
     "shiki": "^3.23.0",
     "splitpanes": "^4.0.4",

@@ -2,11 +2,12 @@
 @import './base.css';
 
 .splitpanes__splitter {
-  min-width: 2px !important;
+  min-width: 8px !important;
   background-color: var(--color-app-border);
   transition: background-color 0.2s;
 }
 
-.splitpanes__splitter:hover {
+.splitpanes__splitter:hover,
+.splitpanes__splitter:focus-visible {
   background-color: var(--color-app-accent);
 }

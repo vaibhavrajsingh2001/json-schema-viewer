@@ -3,6 +3,11 @@ import type { JsonValue } from '@visual-json/core'
 
 const HASH_PREFIX = '#schema/'
 
+export interface DecodeSchemaResult {
+  schema: JsonValue | null
+  malformed: boolean
+}
+
 /**
  * Encodes JSON into a compact URL hash so schemas can be shared without a backend.
  */
@@ -11,18 +16,42 @@ export function encodeSchema(schema: JsonValue): string {
 }
 
 /**
- * Decodes a schema URL hash. Returns null for unrelated, missing, or malformed hashes.
+ * Decodes a schema URL hash and reports whether a matching hash was malformed.
  */
-export function decodeSchema(hash: string): JsonValue | null {
-  if (!hash.startsWith(HASH_PREFIX)) return null
+export function decodeSchemaHash(hash: string): DecodeSchemaResult {
+  if (!hash.startsWith(HASH_PREFIX)) {
+    return {
+      schema: null,
+      malformed: false,
+    }
+  }
 
   try {
     const compressed = hash.slice(HASH_PREFIX.length)
     const json = lzString.decompressFromEncodedURIComponent(compressed)
-    if (!json) return null
-    return JSON.parse(json) as JsonValue
+    if (!json) {
+      return {
+        schema: null,
+        malformed: true,
+      }
+    }
+
+    return {
+      schema: JSON.parse(json) as JsonValue,
+      malformed: false,
+    }
   } catch {
     console.warn('[share] Failed to decode schema from URL')
-    return null
+    return {
+      schema: null,
+      malformed: true,
+    }
   }
+}
+
+/**
+ * Decodes a schema URL hash. Returns null for unrelated, missing, or malformed hashes.
+ */
+export function decodeSchema(hash: string): JsonValue | null {
+  return decodeSchemaHash(hash).schema
 }

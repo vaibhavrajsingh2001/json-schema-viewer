@@ -14,6 +14,7 @@ Core stack:
 - Vite, using `rolldown-vite`
 - pnpm
 - TypeScript project references
+- `@vueuse/core` for reusable Vue composables
 - `@visual-json/vue` for the JSON editor
 - `@kong/spec-renderer` for schema rendering
 - `splitpanes` for the editor/preview layout
@@ -54,7 +55,6 @@ Notes:
   schema renderability checks, editor collapse behavior, and exposing `share()`.
 - `src/components/JsonEditorPane.vue`: wraps `@visual-json/vue`'s `JsonEditor`.
 - `src/components/SchemaPreviewPane.vue`: wraps Kong's `SchemaRenderer`.
-- `src/components/PaneToggleButton.vue`: reusable absolute-positioned pane toggle.
 - `src/components/ThemePicker.vue`: theme selection UI wired to `useTheme`.
 - `src/components/ToastNotification.vue`: global toast UI.
 - `src/composables/useShareableJson.ts`: owns editable JSON state and share-link behavior.
@@ -84,6 +84,12 @@ Notes:
 ## Conventions
 
 - Prefer the `@/` alias for imports from `src`.
+- Vue single-file components must be ordered `<template>`, then `<script setup lang="ts">`,
+  then `<style scoped>`/`<style>`. Keep this order even when examples or generic Vue
+  references show script-first SFCs.
+- Always check whether VueUse can solve a Vue/browser/reactivity requirement before writing
+  custom composable or DOM code; prefer `@vueuse/core` utilities when they fit, and consult
+  the local `vueuse-functions` pi skill for function selection and usage details.
 - Keep component state local unless it is intentionally shared. `useToast` is a deliberate
   module-level singleton.
 - Use `JsonValue` from `@visual-json/vue` or `@visual-json/core` for arbitrary JSON values.
