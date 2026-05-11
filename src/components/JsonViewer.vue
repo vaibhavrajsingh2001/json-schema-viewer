@@ -251,15 +251,19 @@ function openSettings() {
 
 <style scoped>
 .workbench {
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto minmax(0, 1fr);
   background: var(--color-app-bg);
 }
 
 .container {
+  grid-row: 2 / -1;
   height: 100%;
   min-height: 0;
+  overflow: hidden;
 
   &.splitpanes {
     background: var(--color-app-bg);
@@ -267,7 +271,8 @@ function openSettings() {
 
   .splitpanes__pane {
     width: 100%;
-    overflow: auto;
+    min-height: 0;
+    overflow: hidden;
     box-shadow: var(--shadow-app-inset);
   }
 }
@@ -276,11 +281,12 @@ function openSettings() {
 .mobile-panel,
 .desktop-single-pane {
   height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .desktop-single-pane {
-  min-height: 0;
-  overflow: auto;
+  grid-row: 2 / -1;
   box-shadow: var(--shadow-app-inset);
 }
 
@@ -305,7 +311,8 @@ function openSettings() {
 }
 
 .mobile-workbench {
+  grid-row: 3;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 </style>

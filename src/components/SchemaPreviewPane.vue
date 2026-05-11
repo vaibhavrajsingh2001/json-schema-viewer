@@ -76,7 +76,10 @@ const diagnosticsLabel = computed(() => {
 <style scoped>
 .schema-pane {
   container-type: inline-size;
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
   padding: 1rem 1.4rem;
   position: relative;
 }

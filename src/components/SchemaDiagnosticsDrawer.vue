@@ -1,50 +1,52 @@
 <template>
-  <Transition name="diagnostics-drawer">
-    <aside
-      v-if="open"
-      id="schema-diagnostics-drawer"
-      class="diagnostics-drawer"
-      aria-labelledby="diagnostics-drawer-heading"
-      role="dialog"
-      aria-modal="false"
-    >
-      <header class="drawer-header">
-        <div>
-          <p>{{ summary }}</p>
-          <h3 id="diagnostics-drawer-heading">Schema validation</h3>
-        </div>
-        <button
-          type="button"
-          class="icon-btn"
-          aria-label="Close schema validation"
-          @click="emit('close')"
-        >
-          <IconX class="app-icon" aria-hidden="true" />
-        </button>
-      </header>
-
-      <ul v-if="diagnostics.length" class="diagnostics" aria-label="Schema diagnostics">
-        <li
-          v-for="diagnostic in diagnostics"
-          :key="`${diagnostic.severity}-${diagnostic.source}-${diagnostic.path}-${diagnostic.message}`"
-          class="diagnostic"
-          :class="`diagnostic--${diagnostic.severity}`"
-        >
-          <component
-            :is="diagnostic.severity === 'error' ? IconCircleAlert : IconInfo"
-            class="app-icon"
-            aria-hidden="true"
-          />
+  <Teleport to="body">
+    <Transition name="diagnostics-drawer">
+      <aside
+        v-if="open"
+        id="schema-diagnostics-drawer"
+        class="diagnostics-drawer"
+        aria-labelledby="diagnostics-drawer-heading"
+        role="dialog"
+        aria-modal="false"
+      >
+        <header class="drawer-header">
           <div>
-            <strong>{{ diagnostic.severity }}</strong>
-            <span>{{ diagnostic.message }}</span>
-            <code v-if="diagnostic.path">{{ diagnostic.path }}</code>
+            <p>{{ summary }}</p>
+            <h3 id="diagnostics-drawer-heading">Schema validation</h3>
           </div>
-        </li>
-      </ul>
-      <p v-else class="empty-diagnostics">Validation is quiet for the current schema.</p>
-    </aside>
-  </Transition>
+          <button
+            type="button"
+            class="icon-btn"
+            aria-label="Close schema validation"
+            @click="emit('close')"
+          >
+            <IconX class="app-icon" aria-hidden="true" />
+          </button>
+        </header>
+
+        <ul v-if="diagnostics.length" class="diagnostics" aria-label="Schema diagnostics">
+          <li
+            v-for="diagnostic in diagnostics"
+            :key="`${diagnostic.severity}-${diagnostic.source}-${diagnostic.path}-${diagnostic.message}`"
+            class="diagnostic"
+            :class="`diagnostic--${diagnostic.severity}`"
+          >
+            <component
+              :is="diagnostic.severity === 'error' ? IconCircleAlert : IconInfo"
+              class="app-icon"
+              aria-hidden="true"
+            />
+            <div>
+              <strong>{{ diagnostic.severity }}</strong>
+              <span>{{ diagnostic.message }}</span>
+              <code v-if="diagnostic.path">{{ diagnostic.path }}</code>
+            </div>
+          </li>
+        </ul>
+        <p v-else class="empty-diagnostics">Validation is quiet for the current schema.</p>
+      </aside>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -71,17 +73,20 @@ const summary = computed(() => {
 
 <style scoped>
 .diagnostics-drawer {
-  position: absolute;
-  inset-inline: 1rem;
-  bottom: 1rem;
-  z-index: 12;
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 920;
+  width: min(calc(100vw - 2rem), 44rem);
   max-height: min(58vh, 32rem);
   overflow: auto;
   background: var(--color-app-surface);
   border: 1px solid var(--color-app-border);
-  border-radius: 8px;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
   box-shadow: var(--shadow-app-md);
   padding: 0.9rem;
+  transform: translateX(-50%);
 }
 
 .drawer-header {
@@ -191,6 +196,6 @@ const summary = computed(() => {
 .diagnostics-drawer-enter-from,
 .diagnostics-drawer-leave-to {
   opacity: 0;
-  transform: translateY(0.75rem);
+  transform: translate(-50%, 100%);
 }
 </style>

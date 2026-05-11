@@ -1,20 +1,17 @@
 <template>
   <div class="editor-pane">
-    <div class="editor-content">
-      <JsonRawEditor v-if="viewMode === 'raw'" v-model="rawText" :error="rawError" />
-
-      <JsonEditor
-        v-else
-        :value="json"
-        :sidebar-open="sidebarOpenModel"
-        tree-show-values
-        tree-show-counts
-        editor-show-descriptions
-        editor-show-counts
-        :style="{ height: '100%' }"
-        @change="handleJsonChange"
-      />
-    </div>
+    <JsonRawEditor v-if="viewMode === 'raw'" v-model="rawText" :error="rawError" />
+    <JsonEditor
+      v-else
+      :value="json"
+      :sidebar-open="sidebarOpenModel"
+      tree-show-values
+      tree-show-counts
+      editor-show-descriptions
+      editor-show-counts
+      :style="{ height: '100%' }"
+      @change="handleJsonChange"
+    />
   </div>
 </template>
 
@@ -67,11 +64,7 @@ function handleJsonChange(value: JsonValue) {
   background: var(--color-app-surface-raised);
   height: 100%;
   min-height: 0;
-}
-
-.editor-content {
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 </style>
