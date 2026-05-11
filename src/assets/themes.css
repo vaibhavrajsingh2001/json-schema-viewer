@@ -2,7 +2,7 @@
  * Theme primitives.
  *
  * Add new app themes here using `:root[data-theme='<id>']`, then expose the id in
- * `src/composables/useTheme.ts`. Components should consume semantic tokens from
+ * `src/constants/themes.ts`. Components should consume semantic tokens from
  * `base.css` instead of these raw primitive tokens directly.
  */
 :root {
@@ -18,16 +18,24 @@
   --theme-border: #c8d3dc;
   --theme-border-subtle: #e2e8ef;
   --theme-text: #132f3a;
-  --theme-text-muted: #5d7180;
-  --theme-text-subtle: #748592;
+  --theme-text-muted: #4f6270;
+  --theme-text-subtle: #617382;
   --theme-on-primary: #ffffff;
   --theme-on-accent: #ffffff;
   --theme-shadow-rgb: 0 0 0;
+  --theme-focus-ring: #0f8fc6;
+  --theme-success-soft: #e3f5e4;
   --theme-success: #2f7d32;
+  --theme-success-text: #246328;
+  --theme-info-soft: #e0f1fb;
   --theme-info: #0066a6;
+  --theme-info-text: #00517f;
   --theme-warning-soft: #f7e7b8;
   --theme-warning: #f1c96b;
+  --theme-warning-text: #735100;
+  --theme-error-soft: #fde8e5;
   --theme-error: #b42318;
+  --theme-error-text: #8a1c14;
   --theme-code-string: #a64600;
   --theme-code-number: #2f7d32;
   --theme-code-boolean: #0066a6;
@@ -46,16 +54,24 @@
   --theme-border: #334155;
   --theme-border-subtle: #243244;
   --theme-text: #e5eefb;
-  --theme-text-muted: #a8b4c7;
-  --theme-text-subtle: #7f8ea3;
+  --theme-text-muted: #bdc7d8;
+  --theme-text-subtle: #9aa9bd;
   --theme-on-primary: #f8fafc;
   --theme-on-accent: #08111f;
   --theme-shadow-rgb: 0 0 0;
+  --theme-focus-ring: #93c5fd;
+  --theme-success-soft: #12361f;
   --theme-success: #86efac;
+  --theme-success-text: #bbf7d0;
+  --theme-info-soft: #172b4d;
   --theme-info: #93c5fd;
+  --theme-info-text: #bfdbfe;
   --theme-warning-soft: #473a19;
   --theme-warning: #fbbf24;
+  --theme-warning-text: #fde68a;
+  --theme-error-soft: #4a1f23;
   --theme-error: #f87171;
+  --theme-error-text: #fecaca;
   --theme-code-string: #fbbf24;
   --theme-code-number: #86efac;
   --theme-code-boolean: #93c5fd;
@@ -74,16 +90,24 @@
   --theme-border: #cbd8c2;
   --theme-border-subtle: #dde7d6;
   --theme-text: #1d2f25;
-  --theme-text-muted: #5f6f63;
-  --theme-text-subtle: #7a8b7b;
+  --theme-text-muted: #4f604f;
+  --theme-text-subtle: #627563;
   --theme-on-primary: #fffdf5;
   --theme-on-accent: #fffdf5;
   --theme-shadow-rgb: 18 55 42;
+  --theme-focus-ring: #2f7d5c;
+  --theme-success-soft: #e2f2df;
   --theme-success: #2f7d32;
+  --theme-success-text: #246328;
+  --theme-info-soft: #e0f0f4;
   --theme-info: #256d85;
+  --theme-info-text: #1f5a6d;
   --theme-warning-soft: #f3e5b5;
   --theme-warning: #d7a83f;
+  --theme-warning-text: #6b510f;
+  --theme-error-soft: #fbe7e4;
   --theme-error: #b42318;
+  --theme-error-text: #8a1c14;
   --theme-code-string: #9a5a13;
   --theme-code-number: #2f7d32;
   --theme-code-boolean: #256d85;

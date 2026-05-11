@@ -1,12 +1,15 @@
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
+import type { ToastVariant } from '@/types'
 
-const isVisible = ref(false)
-const message = ref('')
+const isVisible = shallowRef(false)
+const message = shallowRef('')
+const variant = shallowRef<ToastVariant>('info')
 let timeoutId: ReturnType<typeof setTimeout> | null = null
 
 export function useToast() {
-  function show(msg: string, duration = 3000) {
+  function show(msg: string, nextVariant: ToastVariant = 'info', duration = 3000) {
     message.value = msg
+    variant.value = nextVariant
     isVisible.value = true
 
     if (timeoutId) {
@@ -22,6 +25,7 @@ export function useToast() {
   return {
     isVisible,
     message,
-    show
+    variant,
+    show,
   }
 }

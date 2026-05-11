@@ -21,6 +21,19 @@
   --color-app-accent: var(--theme-primary);
   --color-app-accent-soft: var(--theme-primary-soft);
   --color-app-on-primary: var(--theme-on-primary);
+  --color-app-focus-ring: var(--theme-focus-ring);
+  --color-app-success-bg: var(--theme-success-soft);
+  --color-app-success-border: var(--theme-success);
+  --color-app-success-text: var(--theme-success-text);
+  --color-app-info-bg: var(--theme-info-soft);
+  --color-app-info-border: var(--theme-info);
+  --color-app-info-text: var(--theme-info-text);
+  --color-app-warning-bg: var(--theme-warning-soft);
+  --color-app-warning-border: var(--theme-warning);
+  --color-app-warning-text: var(--theme-warning-text);
+  --color-app-error-bg: var(--theme-error-soft);
+  --color-app-error-border: var(--theme-error);
+  --color-app-error-text: var(--theme-error-text);
   --shadow-app-sm: 0 1px 4px rgb(var(--theme-shadow-rgb) / 0.2);
   --shadow-app-md: 0 4px 12px rgb(var(--theme-shadow-rgb) / 0.2);
   --shadow-app-inset: 0 0 5px rgb(var(--theme-shadow-rgb) / 0.2) inset;
@@ -44,6 +57,9 @@
   --kui-color-text-neutral-strong: var(--color-app-text);
   --kui-color-text-neutral-weak: var(--color-app-text-muted);
   --kui-color-text-primary: var(--color-app-accent);
+  --kui-color-text-danger: var(--color-app-error-text);
+  --kui-color-text-success: var(--color-app-success-text);
+  --kui-color-text-warning: var(--color-app-warning-text);
   --kui-font-family-text: var(--font-sans);
   --kui-font-family-code: var(--font-mono);
 
@@ -163,5 +179,25 @@ button {
 
   &:active {
     transform: translateY(0);
+  }
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-app-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  button:hover {
+    transform: none;
   }
 }
