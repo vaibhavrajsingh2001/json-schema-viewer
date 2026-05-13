@@ -41,24 +41,6 @@
             </div>
           </section>
 
-          <section class="settings-section" aria-labelledby="editor-setting-heading">
-            <h3 id="editor-setting-heading">JSON editor</h3>
-            <div class="segmented-control" role="group" aria-label="JSON editor view">
-              <label v-for="option in editorViewOptions" :key="option.id">
-                <input v-model="editorViewMode" type="radio" :value="option.id" />
-                <span>{{ option.label }}</span>
-              </label>
-            </div>
-            <label class="switch-row">
-              <span>Sidebar</span>
-              <input
-                v-model="editorSidebarOpen"
-                type="checkbox"
-                :disabled="editorViewMode !== 'tree'"
-              />
-            </label>
-          </section>
-
           <section class="settings-section" aria-labelledby="validation-setting-heading">
             <h3 id="validation-setting-heading">Schema validation</h3>
             <label class="switch-row">
@@ -93,14 +75,12 @@
 </template>
 
 <script setup lang="ts">
-import type { JsonEditorViewMode, SchemaDraftPreference, WorkbenchPaneVisibility } from '@/types'
+import type { SchemaDraftPreference, WorkbenchPaneVisibility } from '@/types'
 import { themePreferences, type ThemePreference } from '@/constants/themes'
 import IconX from '~icons/lucide/x'
 
 const open = defineModel<boolean>('open', { required: true })
 const paneVisibility = defineModel<WorkbenchPaneVisibility>('paneVisibility', { required: true })
-const editorViewMode = defineModel<JsonEditorViewMode>('editorViewMode', { required: true })
-const editorSidebarOpen = defineModel<boolean>('editorSidebarOpen', { required: true })
 const validationEnabled = defineModel<boolean>('validationEnabled', { required: true })
 const schemaDraft = defineModel<SchemaDraftPreference>('schemaDraft', { required: true })
 const currentTheme = defineModel<ThemePreference>('currentTheme', { required: true })
@@ -113,10 +93,6 @@ const schemaDraftOptions: Array<{ id: SchemaDraftPreference; label: string }> = 
   { id: '4', label: 'Draft 4' },
 ]
 
-const editorViewOptions: Array<{ id: JsonEditorViewMode; label: string }> = [
-  { id: 'tree', label: 'Tree' },
-  { id: 'raw', label: 'Raw' },
-]
 </script>
 
 <style scoped>

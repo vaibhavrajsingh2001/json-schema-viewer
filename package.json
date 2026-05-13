@@ -20,11 +20,13 @@
     "format:check": "prettier --check src/"
   },
   "dependencies": {
-    "@cfworker/json-schema": "^4.1.1",
     "@kong/spec-renderer": "^1.107.15",
     "@visual-json/core": "^0.3.1",
     "@visual-json/vue": "^0.3.1",
     "@vueuse/core": "^14.3.0",
+    "ajv": "^8.20.0",
+    "ajv-draft-04": "^1.0.0",
+    "ajv-formats": "^3.0.1",
     "lz-string": "^1.5.0",
     "shiki": "^3.23.0",
     "splitpanes": "^4.0.4",

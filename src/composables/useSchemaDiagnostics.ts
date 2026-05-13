@@ -1,13 +1,98 @@
 import { computed, type ComputedRef } from 'vue'
-import { Validator, type SchemaDraft } from '@cfworker/json-schema'
-import type { SchemaDiagnostic, SchemaDraftPreference } from '@/types'
+import Ajv, { type ErrorObject } from 'ajv'
+import Ajv2019 from 'ajv/dist/2019'
+import Ajv2020 from 'ajv/dist/2020'
+import AjvDraft04 from 'ajv-draft-04'
+import addFormats from 'ajv-formats'
+import type {
+  SchemaDiagnostic,
+  SchemaDiagnosticsSummary,
+  SchemaDraftPreference,
+} from '@/types'
 
-const supportedDrafts = ['4', '7', '2019-09', '2020-12'] as const
+type SchemaDraft = Exclude<SchemaDraftPreference, 'auto'>
+
+const supportedDrafts = ['4', '7', '2019-09', '2020-12'] as const satisfies readonly SchemaDraft[]
 const defaultDraft = '2020-12' satisfies SchemaDraft
+const draftSchemaUris = {
+  '4': 'http://json-schema.org/draft-04/schema#',
+  '7': 'http://json-schema.org/draft-07/schema#',
+  '2019-09': 'https://json-schema.org/draft/2019-09/schema',
+  '2020-12': 'https://json-schema.org/draft/2020-12/schema',
+} satisfies Record<SchemaDraft, string>
+
+type AjvInstance = InstanceType<typeof Ajv>
 
 interface DraftDetection {
   draft: SchemaDraft
   diagnostics: SchemaDiagnostic[]
+}
+
+function createDiagnostic(
+  diagnostic: Omit<SchemaDiagnostic, 'id'> & { id?: string },
+): SchemaDiagnostic {
+  return {
+    id:
+      diagnostic.id ??
+      [
+        diagnostic.category,
+        diagnostic.severity,
+        diagnostic.path,
+        diagnostic.schemaPath,
+        diagnostic.title,
+      ]
+        .filter(Boolean)
+        .join(':'),
+    ...diagnostic,
+  }
+}
+
+function cloneSchema(schema: Record<string, unknown>) {
+  return JSON.parse(JSON.stringify(schema)) as Record<string, unknown>
+}
+
+function cloneSchemaForAjv(schema: Record<string, unknown>, draft: SchemaDraft) {
+  const schemaCopy = cloneSchema(schema)
+
+  if (typeof schemaCopy.$schema !== 'string' || !schemaCopy.$schema.includes(draft)) {
+    schemaCopy.$schema = draftSchemaUris[draft]
+  }
+
+  return schemaCopy
+}
+
+function toErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error)
+}
+
+function createAjv(draft: SchemaDraft): AjvInstance {
+  const options = {
+    allErrors: true,
+    strict: false,
+    verbose: true,
+  }
+
+  if (draft === '4') {
+    const ajv = new AjvDraft04(options) as AjvInstance
+    addFormats(ajv)
+    return ajv
+  }
+
+  if (draft === '2019-09') {
+    const ajv = new Ajv2019(options)
+    addFormats(ajv)
+    return ajv
+  }
+
+  if (draft === '2020-12') {
+    const ajv = new Ajv2020(options)
+    addFormats(ajv)
+    return ajv
+  }
+
+  const ajv = new Ajv(options)
+  addFormats(ajv)
+  return ajv
 }
 
 function detectDraft(
@@ -18,11 +103,15 @@ function detectDraft(
     return {
       draft: draftPreference,
       diagnostics: [
-        {
+        createDiagnostic({
           severity: 'info',
-          message: `Validating with draft ${draftPreference} from app settings.`,
+          category: 'draft',
+          title: `Using draft ${draftPreference}`,
+          message: `Schema validation is using draft ${draftPreference} from app settings.`,
+          action: 'Switch Draft back to Auto if the schema declares a different version.',
+          path: '/$schema',
           source: 'schema-diagnostics',
-        },
+        }),
       ],
     }
   }
@@ -33,12 +122,15 @@ function detectDraft(
     return {
       draft: defaultDraft,
       diagnostics: [
-        {
+        createDiagnostic({
           severity: 'info',
-          message: 'No $schema was declared. Validating with draft 2020-12.',
+          category: 'draft',
+          title: 'No $schema declared',
+          message: 'Validation is using draft 2020-12 because the schema does not declare a draft.',
+          action: 'Add a $schema URI when you want draft-specific validation.',
           path: '/$schema',
           source: 'schema-diagnostics',
-        },
+        }),
       ],
     }
   }
@@ -48,73 +140,172 @@ function detectDraft(
   if (matchedDraft) {
     return {
       draft: matchedDraft,
-      diagnostics: [],
+      diagnostics: [
+        createDiagnostic({
+          severity: 'info',
+          category: 'draft',
+          title: `Draft ${matchedDraft} detected`,
+          message: `Validation is using the declared ${declaredDraft}.`,
+          action: 'No action needed.',
+          path: '/$schema',
+          source: declaredDraft,
+        }),
+      ],
     }
   }
 
   return {
     draft: defaultDraft,
     diagnostics: [
-      {
+      createDiagnostic({
         severity: 'warning',
-        message: `Unsupported or unknown $schema "${declaredDraft}". Validating with draft 2020-12.`,
+        category: 'draft',
+        title: 'Unknown $schema draft',
+        message: `The declared $schema "${declaredDraft}" is not one of the supported drafts.`,
+        action: 'Use draft 4, 7, 2019-09, or 2020-12, or choose a draft in settings.',
         path: '/$schema',
         source: 'schema-diagnostics',
-      },
+      }),
     ],
   }
 }
 
-function toErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : String(error)
+function formatAjvMessage(error: ErrorObject) {
+  const detail = error.message ?? 'Schema validation failed.'
+
+  if (error.keyword === 'type' && error.params && 'type' in error.params) {
+    return `${detail} Expected ${String(error.params.type)}.`
+  }
+
+  if (error.keyword === 'required' && error.params && 'missingProperty' in error.params) {
+    return `${detail} Missing ${String(error.params.missingProperty)}.`
+  }
+
+  return detail
 }
 
-function getValidationDiagnostics(
-  validator: Validator,
+function getSchemaQualityDiagnostics(
   schema: Record<string, unknown>,
+  draft: SchemaDraft,
 ): SchemaDiagnostic[] {
-  try {
-    const result = validator.validate({})
+  const ajv = createAjv(draft)
+  const diagnostics: SchemaDiagnostic[] = []
 
-    if (result.valid) {
+  try {
+    const schemaIsValid = ajv.validateSchema(schema)
+
+    if (!schemaIsValid) {
+      const errors = ajv.errors ?? []
+      diagnostics.push(
+        ...errors.slice(0, 8).map((error) =>
+          createDiagnostic({
+            severity: 'error',
+            category: error.keyword === '$ref' || error.keyword === 'ref' ? 'reference' : 'schema',
+            title: 'Schema keyword is invalid',
+            message: formatAjvMessage(error),
+            action: 'Fix this schema keyword so it matches the active JSON Schema draft.',
+            path: error.instancePath || undefined,
+            schemaPath: error.schemaPath,
+            source: error.keyword,
+          }),
+        ),
+      )
+    }
+
+    ajv.compile(schema)
+  } catch (error) {
+    diagnostics.push(
+      createDiagnostic({
+        severity: 'error',
+        category: toErrorMessage(error).includes('ref') ? 'reference' : 'schema',
+        title: 'Schema setup failed',
+        message: toErrorMessage(error),
+        action: 'Check unresolved $ref values, duplicate $id values, and draft-specific syntax.',
+        source: 'ajv',
+      }),
+    )
+  }
+
+  if (diagnostics.length === 0) {
+    diagnostics.push(
+      createDiagnostic({
+        severity: 'info',
+        category: 'schema',
+        title: 'Schema is valid',
+        message: `The schema is valid for JSON Schema draft ${draft}.`,
+        action: 'No schema-quality fix is needed.',
+        source: 'ajv',
+      }),
+    )
+  }
+
+  return diagnostics
+}
+
+function getRendererDiagnostics(schema: Record<string, unknown>, draft: SchemaDraft): SchemaDiagnostic[] {
+  const ajv = createAjv(draft)
+
+  try {
+    const validate = ajv.compile(schema)
+    const valid = validate({})
+
+    if (valid) {
       return [
-        {
+        createDiagnostic({
           severity: 'info',
-          message: 'Schema is renderer-ready and accepts an empty example object.',
+          category: 'renderer',
+          title: 'Preview is renderer-ready',
+          message: 'Kong can render this schema and an empty example object passes validation.',
+          action: 'No renderer fix is needed.',
           source: 'schema-diagnostics',
-        },
+        }),
       ]
     }
 
-    const failures = result.errors.slice(0, 5).map<SchemaDiagnostic>((error) => ({
-      severity: 'warning',
-      message: `Renderer-ready, but an empty example object fails validation: ${error.error}`,
-      path: error.instanceLocation === '#' ? undefined : error.instanceLocation,
-      source: error.keyword,
-    }))
+    const errors = validate.errors ?? []
+    const failures = errors.slice(0, 5).map<SchemaDiagnostic>((error) =>
+      createDiagnostic({
+        severity: 'warning',
+        category: 'renderer',
+        title: 'Example object fails this schema',
+        message: `Kong can render the schema, but an empty example object fails validation: ${formatAjvMessage(error)}`,
+        action: 'Check required fields and defaults if you want the generated preview example to validate.',
+        path: error.instancePath || undefined,
+        schemaPath: error.schemaPath,
+        source: error.keyword,
+      }),
+    )
 
-    if (result.errors.length > failures.length) {
-      failures.push({
-        severity: 'info',
-        message: `${result.errors.length - failures.length} additional example validation issue(s) hidden.`,
-        source: 'schema-diagnostics',
-      })
+    if (errors.length > failures.length) {
+      failures.push(
+        createDiagnostic({
+          severity: 'info',
+          category: 'renderer',
+          title: 'Additional renderer warnings hidden',
+          message: `${errors.length - failures.length} additional renderer issue(s) are hidden.`,
+          action: 'Fix the visible renderer warnings first, then validate again.',
+          source: 'schema-diagnostics',
+        }),
+      )
     }
 
     return failures
   } catch (error) {
     return [
-      {
+      createDiagnostic({
         severity: 'error',
-        message: `Example validation failed: ${toErrorMessage(error)}`,
-        source: schema.$id ? String(schema.$id) : 'schema-diagnostics',
-      },
+        category: 'renderer',
+        title: 'Renderer validation failed',
+        message: toErrorMessage(error),
+        action: 'Check whether the schema uses unsupported references or malformed nested schemas.',
+        source: schema.$id ? String(schema.$id) : 'ajv',
+      }),
     ]
   }
 }
 
 /**
- * Builds Cloudflare-compatible JSON Schema diagnostics for renderer-ready schemas.
+ * Builds JSON Schema diagnostics for schema quality and renderer readiness.
  */
 export function useSchemaDiagnostics(
   schema: ComputedRef<Record<string, unknown> | null>,
@@ -128,19 +319,63 @@ export function useSchemaDiagnostics(
     if (!schema.value) return []
 
     const { draft, diagnostics } = detectDraft(schema.value, options.draftPreference.value)
+    const schemaCopy = cloneSchemaForAjv(schema.value, draft)
 
-    try {
-      const validator = new Validator(schema.value, draft, false)
-      return [...diagnostics, ...getValidationDiagnostics(validator, schema.value)]
-    } catch (error) {
-      return [
-        ...diagnostics,
-        {
-          severity: 'error',
-          message: `Validator setup failed: ${toErrorMessage(error)}`,
-          source: 'schema-diagnostics',
-        },
-      ]
-    }
+    return [
+      ...diagnostics,
+      ...getSchemaQualityDiagnostics(schemaCopy, draft),
+      ...getRendererDiagnostics(schemaCopy, draft),
+    ]
   })
+}
+
+export function summarizeDiagnostics(
+  diagnostics: SchemaDiagnostic[],
+  validationEnabled: boolean,
+): SchemaDiagnosticsSummary {
+  if (!validationEnabled) {
+    return {
+      severity: 'info',
+      label: 'Validation off',
+      detail: 'Schema quality checks are disabled.',
+      issueCount: 0,
+      errorCount: 0,
+      warningCount: 0,
+    }
+  }
+
+  const errorCount = diagnostics.filter((diagnostic) => diagnostic.severity === 'error').length
+  const warningCount = diagnostics.filter((diagnostic) => diagnostic.severity === 'warning').length
+  const issueCount = errorCount + warningCount
+
+  if (errorCount > 0) {
+    return {
+      severity: 'error',
+      label: `${errorCount} error${errorCount === 1 ? '' : 's'}`,
+      detail: 'Schema quality needs attention.',
+      issueCount,
+      errorCount,
+      warningCount,
+    }
+  }
+
+  if (warningCount > 0) {
+    return {
+      severity: 'warning',
+      label: `${warningCount} warning${warningCount === 1 ? '' : 's'}`,
+      detail: 'Schema renders, but there are review notes.',
+      issueCount,
+      errorCount,
+      warningCount,
+    }
+  }
+
+  return {
+    severity: 'info',
+    label: 'Valid schema',
+    detail: 'Schema quality checks are quiet.',
+    issueCount,
+    errorCount,
+    warningCount,
+  }
 }
