@@ -5,22 +5,7 @@
         <p>Documentation</p>
         <h2 id="preview-heading">Preview</h2>
       </div>
-      <div class="preview-actions">
-        <span class="preview-status" :class="`preview-status--${summary.severity}`">
-          {{ summary.label }}
-        </span>
-        <button
-          v-if="validationEnabled && state.kind === 'ready'"
-          class="issues-trigger"
-          type="button"
-          :aria-expanded="issuesOpen"
-          @click="emit('toggleIssues')"
-        >
-          <IconListChecks class="app-icon" aria-hidden="true" />
-          Issues
-          <strong v-if="summary.issueCount">{{ summary.issueCount }}</strong>
-        </button>
-      </div>
+      <span class="schema-badge" :class="schemaBadgeClass">{{ schemaBadgeLabel }}</span>
     </header>
 
     <div v-if="rawError" class="paused-state" role="status">
@@ -55,24 +40,31 @@ import { SchemaRenderer } from '@kong/spec-renderer'
 import type { PreviewState, SchemaDiagnosticsSummary } from '@/types'
 import IconCircleAlert from '~icons/lucide/circle-alert'
 import IconInfo from '~icons/lucide/info'
-import IconListChecks from '~icons/lucide/list-checks'
 
 const props = defineProps<{
   schema: Record<string, unknown> | null
-  issuesOpen: boolean
   validationEnabled: boolean
   state: PreviewState
   summary: SchemaDiagnosticsSummary
   rawError: string | null
 }>()
 
-const emit = defineEmits<{
-  toggleIssues: []
-}>()
-
 const stateIcon = computed(() =>
   props.state.kind === 'empty' && props.state.severity === 'error' ? IconCircleAlert : IconInfo,
 )
+
+const schemaIsInvalid = computed(() => props.summary.issueCount > 0)
+
+const schemaBadgeLabel = computed(() => {
+  if (!props.validationEnabled) return 'Validation off'
+  return schemaIsInvalid.value ? 'Invalid schema' : 'Valid schema'
+})
+
+const schemaBadgeClass = computed(() => ({
+  'schema-badge--error': props.validationEnabled && props.summary.severity === 'error',
+  'schema-badge--warning': props.validationEnabled && props.summary.severity === 'warning',
+  'schema-badge--disabled': !props.validationEnabled,
+}))
 </script>
 
 <style scoped>
@@ -123,61 +115,37 @@ const stateIcon = computed(() =>
   }
 }
 
-.preview-actions {
+.schema-badge {
   align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: flex-end;
-}
-
-.preview-status {
   background: var(--color-app-info-bg);
   border: 1px solid var(--color-app-info-border);
   border-radius: 999px;
   color: var(--color-app-info-text);
+  display: inline-flex;
   font-size: 0.76rem;
   font-weight: 800;
+  line-height: 1;
   min-height: 28px;
   padding: 0.25rem 0.6rem;
+  white-space: nowrap;
 }
 
-.preview-status--warning {
+.schema-badge--warning {
   background: var(--color-app-warning-bg);
   border-color: var(--color-app-warning-border);
   color: var(--color-app-warning-text);
 }
 
-.preview-status--error {
+.schema-badge--error {
   background: var(--color-app-error-bg);
   border-color: var(--color-app-error-border);
   color: var(--color-app-error-text);
 }
 
-.issues-trigger {
-  align-items: center;
+.schema-badge--disabled {
   background: var(--color-app-surface);
   border-color: var(--color-app-border);
-  color: var(--color-app-text);
-  display: inline-flex;
-  font-size: 0.82rem;
-  gap: 0.35rem;
-  min-height: 34px;
-  padding: 0.2rem 0.6rem;
-
-  strong {
-    align-items: center;
-    background: var(--color-app-accent-soft);
-    border-radius: 999px;
-    color: var(--color-app-accent);
-    display: inline-flex;
-    font-size: 0.72rem;
-    font-weight: 800;
-    justify-content: center;
-    min-height: 1.2rem;
-    min-width: 1.2rem;
-    padding: 0 0.3rem;
-  }
+  color: var(--color-app-text-muted);
 }
 
 .paused-state,
@@ -244,8 +212,8 @@ const stateIcon = computed(() =>
     flex-direction: column;
   }
 
-  .preview-actions {
-    justify-content: flex-start;
+  .schema-badge {
+    width: fit-content;
   }
 }
 </style>
