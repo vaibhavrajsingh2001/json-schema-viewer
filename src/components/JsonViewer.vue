@@ -75,12 +75,10 @@
       >
         <SchemaPreviewPane
           :schema="renderableSchema"
-          :issues-open="issuesOpen"
           :validation-enabled="validationEnabled"
           :state="previewState"
           :summary="diagnosticsSummary"
           :raw-error="rawError"
-          @toggle-issues="toggleIssues"
         />
       </section>
       <section
@@ -94,7 +92,7 @@
         <SchemaIssuesPanel
           :diagnostics="visibleDiagnostics"
           :summary="diagnosticsSummary"
-          @close="issuesOpen = false"
+          @close="closeIssues"
           @focus-issue="focusIssue"
           @copied="handlePathCopied"
         />
@@ -121,18 +119,16 @@
       <div class="preview-workspace" :class="{ 'preview-workspace--with-issues': issuesOpen }">
         <SchemaPreviewPane
           :schema="renderableSchema"
-          :issues-open="issuesOpen"
           :validation-enabled="validationEnabled"
           :state="previewState"
           :summary="diagnosticsSummary"
           :raw-error="rawError"
-          @toggle-issues="toggleIssues"
         />
         <SchemaIssuesPanel
           v-if="issuesOpen"
           :diagnostics="visibleDiagnostics"
           :summary="diagnosticsSummary"
-          @close="issuesOpen = false"
+          @close="closeIssues"
           @focus-issue="focusIssue"
           @copied="handlePathCopied"
         />
@@ -156,18 +152,16 @@
         <div class="preview-workspace" :class="{ 'preview-workspace--with-issues': issuesOpen }">
           <SchemaPreviewPane
             :schema="renderableSchema"
-            :issues-open="issuesOpen"
             :validation-enabled="validationEnabled"
             :state="previewState"
             :summary="diagnosticsSummary"
             :raw-error="rawError"
-            @toggle-issues="toggleIssues"
           />
           <SchemaIssuesPanel
             v-if="issuesOpen"
             :diagnostics="visibleDiagnostics"
             :summary="diagnosticsSummary"
-            @close="issuesOpen = false"
+            @close="closeIssues"
             @focus-issue="focusIssue"
             @copied="handlePathCopied"
           />
@@ -353,9 +347,21 @@ function setMobileViewMode(nextViewMode: WorkbenchViewMode) {
 }
 
 function toggleIssues() {
-  issuesOpen.value = !issuesOpen.value
+  if (issuesOpen.value) {
+    closeIssues()
+    return
+  }
+
+  issuesOpen.value = true
   if (issuesOpen.value && isMobile.value) {
     viewMode.value = 'issues'
+  }
+}
+
+function closeIssues() {
+  issuesOpen.value = false
+  if (isMobile.value && viewMode.value === 'issues') {
+    viewMode.value = paneVisibility.value === 'preview' ? 'preview' : 'editor'
   }
 }
 

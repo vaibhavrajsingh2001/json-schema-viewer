@@ -40,6 +40,8 @@ function createDiagnostic(
         diagnostic.path,
         diagnostic.schemaPath,
         diagnostic.title,
+        diagnostic.message,
+        diagnostic.source,
       ]
         .filter(Boolean)
         .join(':'),
@@ -197,8 +199,9 @@ function getSchemaQualityDiagnostics(
     if (!schemaIsValid) {
       const errors = ajv.errors ?? []
       diagnostics.push(
-        ...errors.slice(0, 8).map((error) =>
+        ...errors.slice(0, 8).map((error, index) =>
           createDiagnostic({
+            id: `schema-quality:${index}:${error.keyword}:${error.instancePath}:${error.schemaPath}`,
             severity: 'error',
             category: error.keyword === '$ref' || error.keyword === 'ref' ? 'reference' : 'schema',
             title: 'Schema keyword is invalid',
@@ -246,50 +249,18 @@ function getRendererDiagnostics(schema: Record<string, unknown>, draft: SchemaDr
   const ajv = createAjv(draft)
 
   try {
-    const validate = ajv.compile(schema)
-    const valid = validate({})
+    ajv.compile(schema)
 
-    if (valid) {
-      return [
-        createDiagnostic({
-          severity: 'info',
-          category: 'renderer',
-          title: 'Preview is renderer-ready',
-          message: 'Kong can render this schema and an empty example object passes validation.',
-          action: 'No renderer fix is needed.',
-          source: 'schema-diagnostics',
-        }),
-      ]
-    }
-
-    const errors = validate.errors ?? []
-    const failures = errors.slice(0, 5).map<SchemaDiagnostic>((error) =>
+    return [
       createDiagnostic({
-        severity: 'warning',
+        severity: 'info',
         category: 'renderer',
-        title: 'Example object fails this schema',
-        message: `Kong can render the schema, but an empty example object fails validation: ${formatAjvMessage(error)}`,
-        action: 'Check required fields and defaults if you want the generated preview example to validate.',
-        path: error.instancePath || undefined,
-        schemaPath: error.schemaPath,
-        source: error.keyword,
+        title: 'Preview is renderer-ready',
+        message: 'The schema can be compiled for preview readiness checks.',
+        action: 'No renderer fix is needed.',
+        source: 'schema-diagnostics',
       }),
-    )
-
-    if (errors.length > failures.length) {
-      failures.push(
-        createDiagnostic({
-          severity: 'info',
-          category: 'renderer',
-          title: 'Additional renderer warnings hidden',
-          message: `${errors.length - failures.length} additional renderer issue(s) are hidden.`,
-          action: 'Fix the visible renderer warnings first, then validate again.',
-          source: 'schema-diagnostics',
-        }),
-      )
-    }
-
-    return failures
+    ]
   } catch (error) {
     return [
       createDiagnostic({

@@ -26,10 +26,9 @@
         </button>
         <div class="issue-meta">
           <span class="issue-chip">{{ diagnostic.category }}</span>
-          <code v-if="diagnostic.path">{{ diagnostic.path }}</code>
-          <code v-else-if="diagnostic.schemaPath">{{ diagnostic.schemaPath }}</code>
+          <code v-if="pathFor(diagnostic)">{{ pathFor(diagnostic) }}</code>
           <button
-            v-if="diagnostic.path || diagnostic.schemaPath"
+            v-if="pathFor(diagnostic)"
             class="copy-btn"
             type="button"
             @click="copyPath(diagnostic)"
@@ -81,12 +80,20 @@ function iconFor(severity: SchemaDiagnosticSeverity) {
   return IconCircleCheck
 }
 
+function pathFor(diagnostic: SchemaDiagnostic) {
+  return (diagnostic.path ?? diagnostic.schemaPath)?.replace(/^#/, '')
+}
+
 async function copyPath(diagnostic: SchemaDiagnostic) {
-  const path = diagnostic.path ?? diagnostic.schemaPath
+  const path = pathFor(diagnostic)
   if (!path) return
 
-  await navigator.clipboard.writeText(path)
-  emit('copied', path)
+  try {
+    await navigator.clipboard.writeText(path)
+    emit('copied', path)
+  } catch (error) {
+    console.warn('Could not copy schema issue path.', error)
+  }
 }
 </script>
 
@@ -134,6 +141,7 @@ async function copyPath(diagnostic: SchemaDiagnostic) {
 }
 
 .issues-list {
+  align-content: start;
   display: grid;
   gap: 0;
   list-style: none;
@@ -144,6 +152,7 @@ async function copyPath(diagnostic: SchemaDiagnostic) {
 }
 
 .issue {
+  align-content: start;
   border-bottom: 1px solid var(--color-app-border-subtle);
   border-left: 3px solid var(--color-app-info-border);
   display: grid;
