@@ -48,6 +48,7 @@
   /* Schema Renderer theme bridge */
   --kui-color-background: var(--color-app-bg);
   --kui-color-background-neutral-weakest: var(--color-app-surface-raised);
+  --kui-color-background-neutral-weaker: var(--color-app-surface-hover);
   --kui-color-background-neutral-weak: var(--color-app-surface-hover);
   --kui-color-background-primary-weakest: var(--color-app-accent-soft);
   --kui-color-border: var(--color-app-border);
@@ -55,6 +56,8 @@
   --kui-color-text: var(--color-app-text);
   --kui-color-text-neutral: var(--color-app-text);
   --kui-color-text-neutral-strong: var(--color-app-text);
+  --kui-color-text-neutral-stronger: var(--color-app-text);
+  --kui-color-text-neutral-strongest: var(--color-app-text);
   --kui-color-text-neutral-weak: var(--color-app-text-muted);
   --kui-color-text-primary: var(--color-app-accent);
   --kui-color-text-danger: var(--color-app-error-text);
@@ -67,14 +70,14 @@
   --theme-json-bg: var(--color-app-surface-raised);
   --theme-json-bg-panel: var(--color-app-surface);
   --theme-json-bg-hover: var(--color-app-surface-hover);
-  --theme-json-bg-selected: var(--color-app-accent);
-  --theme-json-bg-selected-muted: var(--color-app-accent-soft);
+  --theme-json-bg-selected: var(--theme-json-selection-bg);
+  --theme-json-bg-selected-muted: var(--theme-json-selection-bg-muted);
   --theme-json-bg-match: var(--theme-warning-soft);
   --theme-json-bg-match-active: var(--theme-warning);
   --theme-json-border: var(--color-app-border);
   --theme-json-border-subtle: var(--color-app-border-subtle);
   --theme-json-text: var(--color-app-text);
-  --theme-json-text-selected: var(--theme-on-accent);
+  --theme-json-text-selected: var(--color-app-text);
   --theme-json-text-muted: var(--color-app-text-muted);
   --theme-json-text-dim: var(--color-app-text-subtle);
   --theme-json-text-dimmer: var(--color-app-text-subtle);
