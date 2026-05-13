@@ -3,8 +3,8 @@
     <JsonRawEditor
       v-if="viewMode === 'raw'"
       v-model="rawText"
+      v-model:view-mode="viewMode"
       :error="rawError"
-      @switch-tree="viewMode = 'tree'"
     />
 
     <VisualJson v-else :value="json" @change="handleJsonChange">

@@ -26,6 +26,7 @@
       </div>
 
       <button
+        v-if="showSidebarToggle"
         class="icon-btn"
         type="button"
         title="Toggle outline"
@@ -43,8 +44,12 @@
 import type { JsonEditorViewMode } from '@/types'
 import IconPanelLeft from '~icons/lucide/panel-left'
 
+const { showSidebarToggle = true } = defineProps<{
+  showSidebarToggle?: boolean
+}>()
+
 const viewMode = defineModel<JsonEditorViewMode>('viewMode', { required: true })
-const sidebarOpen = defineModel<boolean>('sidebarOpen', { required: true })
+const sidebarOpen = defineModel<boolean>('sidebarOpen', { default: false })
 </script>
 
 <style scoped>
