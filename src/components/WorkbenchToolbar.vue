@@ -1,9 +1,23 @@
 <template>
   <nav class="toolbar" aria-label="Application toolbar">
-    <h1>JSON Schema Viewer</h1>
+    <div class="brand">
+      <h1>JSON Schema Viewer</h1>
+    </div>
+
     <div class="toolbar-actions">
       <button
         class="tool-btn"
+        type="button"
+        :aria-pressed="issuesOpen"
+        :class="{ 'tool-btn--active': issuesOpen }"
+        @click="onToggleIssues"
+      >
+        <IconListChecks class="app-icon" aria-hidden="true" />
+        <span>Issues</span>
+        <strong v-if="summary.issueCount">{{ summary.issueCount }}</strong>
+      </button>
+      <button
+        class="icon-btn"
         title="Open settings"
         type="button"
         aria-label="Open settings"
@@ -11,13 +25,7 @@
       >
         <IconSettings class="app-icon" aria-hidden="true" />
       </button>
-      <button
-        class="tool-btn share-btn"
-        title="Copy share link"
-        type="button"
-        aria-label="Copy share link"
-        @click="onShare"
-      >
+      <button class="tool-btn share-btn" type="button" aria-label="Copy share link" @click="onShare">
         <IconShare2 class="app-icon" aria-hidden="true" />
         <span>Share</span>
       </button>
@@ -26,81 +34,126 @@
 </template>
 
 <script setup lang="ts">
-import type { ShareResult } from '@/types'
+import type { SchemaDiagnosticsSummary, ShareResult } from '@/types'
+import IconListChecks from '~icons/lucide/list-checks'
 import IconSettings from '~icons/lucide/settings'
 import IconShare2 from '~icons/lucide/share-2'
 
 defineProps<{
+  summary: SchemaDiagnosticsSummary
+  issuesOpen: boolean
   onShare: () => void | ShareResult | Promise<void | ShareResult>
   onOpenSettings: () => void
+  onToggleIssues: () => void
 }>()
 </script>
 
 <style scoped>
 .toolbar {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  background-color: var(--color-app-primary);
-  color: var(--color-app-on-primary);
-  min-height: var(--navbar-height);
-  padding: 0.5rem 1rem;
+  background: var(--color-app-surface) !important;
+  border-bottom: 1px solid var(--color-app-border);
+  color: var(--color-app-text) !important;
+  display: flex;
   gap: 1rem;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 0.55rem 0.75rem;
+}
+
+.brand {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  min-width: 0;
 
   h1 {
-    font-family: var(--font-sans);
-    font-size: clamp(1rem, 2vw, 1.45rem);
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 800;
     line-height: 1.1;
     margin: 0;
+    white-space: nowrap;
   }
 }
 
 .toolbar-actions {
-  display: flex;
   align-items: center;
-  gap: 0.75rem;
+  display: flex;
   flex-wrap: wrap;
+  gap: 0.5rem;
   justify-content: flex-end;
 }
 
-.tool-btn {
-  background: var(--color-app-surface);
-  color: var(--color-app-primary);
-  font-size: 0.9rem;
-  min-height: 36px;
-  min-width: 36px;
-  display: flex;
+.tool-btn,
+.icon-btn {
   align-items: center;
+  background: var(--color-app-surface-raised);
+  border-color: var(--color-app-border);
+  color: var(--color-app-text);
+  display: inline-flex;
+  font-size: 0.88rem;
+  gap: 0.4rem;
   justify-content: center;
-  gap: 0.35rem;
-  font-weight: 500;
-  padding: 0.3rem 0.65rem;
+  min-height: 38px;
+}
 
-  .app-icon {
-    font-size: 1rem;
-  }
+.tool-btn {
+  padding: 0.3rem 0.7rem;
 
-  &:hover {
-    background: var(--color-app-surface-raised);
-    box-shadow: var(--shadow-app-sm);
+  strong {
+    align-items: center;
+    background: var(--color-app-accent-soft);
+    border-radius: 999px;
+    color: var(--color-app-accent);
+    display: inline-flex;
+    font-size: 0.72rem;
+    font-weight: 800;
+    justify-content: center;
+    min-height: 1.25rem;
+    min-width: 1.25rem;
+    padding: 0 0.3rem;
   }
+}
+
+.icon-btn {
+  min-width: 38px;
+}
+
+.tool-btn--active {
+  border-color: var(--color-app-accent);
+  color: var(--color-app-accent);
 }
 
 .share-btn {
-  min-width: auto;
-  padding-inline: 0.8rem;
+  background: var(--color-app-accent);
+  border-color: var(--color-app-accent);
+  color: var(--theme-on-accent);
 }
 
-@media (max-width: 520px) {
+.app-icon {
+  font-size: 1rem;
+}
+
+@media (max-width: 700px) {
   .toolbar {
-    align-items: flex-start;
+    align-items: stretch;
     flex-direction: column;
   }
 
+  .brand,
   .toolbar-actions {
-    width: 100%;
     justify-content: space-between;
+    width: 100%;
+  }
+
+  .toolbar-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tool-btn,
+  .icon-btn {
+    min-width: 0;
   }
 }
 </style>

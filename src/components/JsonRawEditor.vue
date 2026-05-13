@@ -1,5 +1,6 @@
 <template>
   <div class="raw-editor-wrap">
+    <JsonEditorPaneHeader v-model:view-mode="viewMode" :show-sidebar-toggle="false" />
     <p v-if="error" class="raw-error" role="status">
       {{ error }}
     </p>
@@ -13,11 +14,15 @@
 </template>
 
 <script setup lang="ts">
+import type { JsonEditorViewMode } from '@/types'
+import JsonEditorPaneHeader from '@/components/JsonEditorPaneHeader.vue'
+
 defineProps<{
   error: string | null
 }>()
 
 const rawText = defineModel<string>({ required: true })
+const viewMode = defineModel<JsonEditorViewMode>('viewMode', { required: true })
 </script>
 
 <style scoped>

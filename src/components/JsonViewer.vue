@@ -1,6 +1,12 @@
 <template>
   <div class="workbench">
-    <WorkbenchToolbar :on-share="share" :on-open-settings="openSettings" />
+    <WorkbenchToolbar
+      :summary="diagnosticsSummary"
+      :issues-open="issuesOpen"
+      :on-share="share"
+      :on-open-settings="openSettings"
+      :on-toggle-issues="toggleIssues"
+    />
 
     <div v-if="isMobile" class="mobile-tabs" role="tablist" aria-label="Workbench view">
       <button
@@ -27,6 +33,18 @@
       >
         Preview
       </button>
+      <button
+        id="issues-tab"
+        class="mobile-tab"
+        :class="{ 'mobile-tab--active': activeViewMode === 'issues' }"
+        type="button"
+        role="tab"
+        :aria-selected="activeViewMode === 'issues'"
+        aria-controls="issues-panel"
+        @click="setMobileViewMode('issues')"
+      >
+        Issues
+      </button>
     </div>
 
     <div v-if="isMobile" class="mobile-workbench">
@@ -40,8 +58,11 @@
       >
         <JsonEditorPane
           v-model="jsonContent"
+          v-model:raw-error="rawError"
           v-model:sidebar-open="editorSidebarOpen"
           v-model:view-mode="editorViewMode"
+          :target-path="targetPath"
+          @targeted="targetPath = null"
         />
       </section>
       <section
@@ -54,12 +75,26 @@
       >
         <SchemaPreviewPane
           :schema="renderableSchema"
-          :diagnostics="previewDiagnostics"
-          :diagnostics-open="diagnosticsOpen"
           :validation-enabled="validationEnabled"
           :state="previewState"
-          @toggle-diagnostics="diagnosticsOpen = !diagnosticsOpen"
-          @close-diagnostics="diagnosticsOpen = false"
+          :summary="diagnosticsSummary"
+          :raw-error="rawError"
+        />
+      </section>
+      <section
+        id="issues-panel"
+        class="mobile-panel"
+        role="tabpanel"
+        aria-labelledby="issues-tab"
+        :hidden="activeViewMode !== 'issues'"
+        :inert="activeViewMode !== 'issues'"
+      >
+        <SchemaIssuesPanel
+          :diagnostics="visibleDiagnostics"
+          :summary="diagnosticsSummary"
+          @close="closeIssues"
+          @focus-issue="focusIssue"
+          @copied="handlePathCopied"
         />
       </section>
     </div>
@@ -72,21 +107,32 @@
     >
       <JsonEditorPane
         v-model="jsonContent"
+        v-model:raw-error="rawError"
         v-model:sidebar-open="editorSidebarOpen"
         v-model:view-mode="editorViewMode"
+        :target-path="targetPath"
+        @targeted="targetPath = null"
       />
     </section>
 
     <section v-else-if="paneVisibility === 'preview'" class="desktop-single-pane">
-      <SchemaPreviewPane
-        :schema="renderableSchema"
-        :diagnostics="previewDiagnostics"
-        :diagnostics-open="diagnosticsOpen"
-        :validation-enabled="validationEnabled"
-        :state="previewState"
-        @toggle-diagnostics="diagnosticsOpen = !diagnosticsOpen"
-        @close-diagnostics="diagnosticsOpen = false"
-      />
+      <div class="preview-workspace" :class="{ 'preview-workspace--with-issues': issuesOpen }">
+        <SchemaPreviewPane
+          :schema="renderableSchema"
+          :validation-enabled="validationEnabled"
+          :state="previewState"
+          :summary="diagnosticsSummary"
+          :raw-error="rawError"
+        />
+        <SchemaIssuesPanel
+          v-if="issuesOpen"
+          :diagnostics="visibleDiagnostics"
+          :summary="diagnosticsSummary"
+          @close="closeIssues"
+          @focus-issue="focusIssue"
+          @copied="handlePathCopied"
+        />
+      </div>
     </section>
 
     <Splitpanes v-else class="container">
@@ -94,29 +140,38 @@
         <section id="desktop-editor-pane" class="desktop-pane" aria-label="JSON editor">
           <JsonEditorPane
             v-model="jsonContent"
+            v-model:raw-error="rawError"
             v-model:sidebar-open="editorSidebarOpen"
             v-model:view-mode="editorViewMode"
+            :target-path="targetPath"
+            @targeted="targetPath = null"
           />
         </section>
       </Pane>
       <Pane :size="100 - editorSize">
-        <SchemaPreviewPane
-          :schema="renderableSchema"
-          :diagnostics="previewDiagnostics"
-          :diagnostics-open="diagnosticsOpen"
-          :validation-enabled="validationEnabled"
-          :state="previewState"
-          @toggle-diagnostics="diagnosticsOpen = !diagnosticsOpen"
-          @close-diagnostics="diagnosticsOpen = false"
-        />
+        <div class="preview-workspace" :class="{ 'preview-workspace--with-issues': issuesOpen }">
+          <SchemaPreviewPane
+            :schema="renderableSchema"
+            :validation-enabled="validationEnabled"
+            :state="previewState"
+            :summary="diagnosticsSummary"
+            :raw-error="rawError"
+          />
+          <SchemaIssuesPanel
+            v-if="issuesOpen"
+            :diagnostics="visibleDiagnostics"
+            :summary="diagnosticsSummary"
+            @close="closeIssues"
+            @focus-issue="focusIssue"
+            @copied="handlePathCopied"
+          />
+        </div>
       </Pane>
     </Splitpanes>
 
     <WorkbenchSettingsPanel
       v-model:open="settingsOpen"
       v-model:pane-visibility="paneVisibility"
-      v-model:editor-view-mode="editorViewMode"
-      v-model:editor-sidebar-open="editorSidebarOpen"
       v-model:validation-enabled="validationEnabled"
       v-model:schema-draft="schemaDraft"
       v-model:current-theme="currentTheme"
@@ -125,25 +180,27 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef, computed, watch } from 'vue'
+import { shallowRef, computed, nextTick, watch } from 'vue'
 import { Splitpanes, Pane } from 'splitpanes'
 import type { JsonValue } from '@visual-json/vue'
 import sampleSchema from '@/assets/sample-schema.json' with { type: 'json' }
 import type {
   PreviewState,
   JsonEditorViewMode,
+  SchemaDiagnostic,
   SchemaDraftPreference,
   WorkbenchPaneVisibility,
   WorkbenchViewMode,
 } from '@/types'
 import { useMediaQuery } from '@vueuse/core'
-import { useSchemaDiagnostics } from '@/composables/useSchemaDiagnostics'
+import { summarizeDiagnostics, useSchemaDiagnostics } from '@/composables/useSchemaDiagnostics'
 import { useToast } from '@/composables/useToast'
 import { useShareableJson } from '@/composables/useShareableJson'
 import { useTheme } from '@/composables/useTheme'
 import WorkbenchToolbar from '@/components/WorkbenchToolbar.vue'
 import WorkbenchSettingsPanel from '@/components/WorkbenchSettingsPanel.vue'
 import JsonEditorPane from '@/components/JsonEditorPane.vue'
+import SchemaIssuesPanel from '@/components/SchemaIssuesPanel.vue'
 import SchemaPreviewPane from '@/components/SchemaPreviewPane.vue'
 
 const { show: showToast } = useToast()
@@ -159,8 +216,10 @@ const editorViewMode = shallowRef<JsonEditorViewMode>('tree')
 const editorSidebarOpen = shallowRef(false)
 const validationEnabled = shallowRef(true)
 const schemaDraft = shallowRef<SchemaDraftPreference>('auto')
-const diagnosticsOpen = shallowRef(false)
+const issuesOpen = shallowRef(false)
 const settingsOpen = shallowRef(false)
+const rawError = shallowRef<string | null>(null)
+const targetPath = shallowRef<string | null>(null)
 
 const renderableSchema = computed<Record<string, unknown> | null>(() => {
   const value = jsonContent.value
@@ -173,12 +232,13 @@ const renderableSchema = computed<Record<string, unknown> | null>(() => {
   return value as Record<string, unknown>
 })
 
-const diagnostics = useSchemaDiagnostics(renderableSchema, {
+const schemaDiagnostics = useSchemaDiagnostics(renderableSchema, {
   enabled: computed(() => validationEnabled.value),
   draftPreference: computed(() => schemaDraft.value),
 })
 
 const activeViewMode = computed<WorkbenchViewMode>(() => {
+  if (issuesOpen.value && viewMode.value === 'issues') return 'issues'
   if (paneVisibility.value === 'editor') return 'editor'
   if (paneVisibility.value === 'preview') return 'preview'
   return viewMode.value
@@ -218,30 +278,111 @@ const previewState = computed<PreviewState>(() => {
   return { kind: 'ready' }
 })
 
-const previewDiagnostics = computed(() => {
-  if (previewState.value.kind !== 'ready') return []
-  return diagnostics.value
+const visibleDiagnostics = computed<SchemaDiagnostic[]>(() => {
+  const diagnostics: SchemaDiagnostic[] = []
+
+  if (rawError.value) {
+    diagnostics.push({
+      id: 'raw-json-syntax',
+      severity: 'error',
+      category: 'syntax',
+      title: 'Raw JSON syntax error',
+      message: rawError.value,
+      action: 'Fix the JSON syntax in Raw mode to resume live preview updates.',
+      source: 'raw-editor',
+    })
+  }
+
+  if (previewState.value.kind !== 'ready') {
+    diagnostics.push({
+      id: 'preview-root-state',
+      severity: previewState.value.severity,
+      category: 'root',
+      title: previewState.value.title,
+      message: previewState.value.message,
+      action: 'Use an object at the JSON root so the documentation preview can render.',
+      source: 'preview',
+    })
+  }
+
+  if (previewState.value.kind === 'ready') {
+    diagnostics.push(...schemaDiagnostics.value)
+  }
+
+  return diagnostics
+})
+
+const diagnosticsSummary = computed(() => {
+  const hasLocalIssues = rawError.value || previewState.value.kind !== 'ready'
+  return summarizeDiagnostics(
+    visibleDiagnostics.value,
+    hasLocalIssues ? true : validationEnabled.value,
+  )
 })
 
 const editorSize = computed(() => 50)
 
 watch([validationEnabled, previewState], () => {
-  if (!validationEnabled.value || previewState.value.kind !== 'ready') {
-    diagnosticsOpen.value = false
+  if (!validationEnabled.value && previewState.value.kind === 'ready') {
+    issuesOpen.value = false
   }
 })
 
 watch(paneVisibility, (nextVisibility) => {
   if (nextVisibility === 'editor') {
-    diagnosticsOpen.value = false
+    issuesOpen.value = false
   }
 })
 
 function setMobileViewMode(nextViewMode: WorkbenchViewMode) {
   viewMode.value = nextViewMode
+  if (nextViewMode === 'issues') {
+    issuesOpen.value = true
+    return
+  }
+
   if (paneVisibility.value !== 'both') {
     paneVisibility.value = nextViewMode
   }
+}
+
+function toggleIssues() {
+  if (issuesOpen.value) {
+    closeIssues()
+    return
+  }
+
+  issuesOpen.value = true
+  if (issuesOpen.value && isMobile.value) {
+    viewMode.value = 'issues'
+  }
+}
+
+function closeIssues() {
+  issuesOpen.value = false
+  if (isMobile.value && viewMode.value === 'issues') {
+    viewMode.value = paneVisibility.value === 'preview' ? 'preview' : 'editor'
+  }
+}
+
+function focusIssue(diagnostic: SchemaDiagnostic) {
+  const path = diagnostic.path
+  if (path) {
+    targetPath.value = null
+    nextTick(() => {
+      targetPath.value = path
+    })
+  }
+
+  issuesOpen.value = false
+  viewMode.value = 'editor'
+  if (paneVisibility.value === 'preview') {
+    paneVisibility.value = 'both'
+  }
+}
+
+function handlePathCopied(path: string) {
+  showToast(`Copied ${path}.`, 'success')
 }
 
 function openSettings() {
@@ -251,12 +392,12 @@ function openSettings() {
 
 <style scoped>
 .workbench {
+  background: var(--color-app-bg);
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
   height: 100vh;
   min-height: 0;
   overflow: hidden;
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  background: var(--color-app-bg);
 }
 
 .container {
@@ -270,10 +411,9 @@ function openSettings() {
   }
 
   .splitpanes__pane {
-    width: 100%;
     min-height: 0;
     overflow: hidden;
-    box-shadow: var(--shadow-app-inset);
+    width: 100%;
   }
 }
 
@@ -287,22 +427,44 @@ function openSettings() {
 
 .desktop-single-pane {
   grid-row: 2 / -1;
-  box-shadow: var(--shadow-app-inset);
+}
+
+.preview-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+  position: relative;
+}
+
+.preview-workspace--with-issues {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.preview-workspace--with-issues :deep(.issues-panel) {
+  bottom: 0;
+  box-shadow: var(--shadow-app-md);
+  max-width: min(24rem, 55%);
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 22rem;
+  z-index: 5;
 }
 
 .mobile-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   background: var(--color-app-surface);
   border-bottom: 1px solid var(--color-app-border);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .mobile-tab {
-  border-radius: 0;
   border: 0;
   border-bottom: 3px solid transparent;
+  border-radius: 0;
+  font-weight: 800;
   min-height: 44px;
-  font-weight: 700;
 }
 
 .mobile-tab--active {
@@ -314,5 +476,12 @@ function openSettings() {
   grid-row: 3;
   min-height: 0;
   overflow: hidden;
+}
+
+@media (max-width: 1020px) {
+  .preview-workspace--with-issues :deep(.issues-panel) {
+    max-width: min(22rem, 64%);
+    width: 20rem;
+  }
 }
 </style>

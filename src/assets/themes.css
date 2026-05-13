@@ -39,6 +39,8 @@
   --theme-code-string: #a64600;
   --theme-code-number: #2f7d32;
   --theme-code-boolean: #0066a6;
+  --theme-json-selection-bg: #d8edf5;
+  --theme-json-selection-bg-muted: #e8eef3;
 }
 
 :root[data-theme='midnight'] {
@@ -75,6 +77,8 @@
   --theme-code-string: #fbbf24;
   --theme-code-number: #86efac;
   --theme-code-boolean: #93c5fd;
+  --theme-json-selection-bg: #294968;
+  --theme-json-selection-bg-muted: #1f2a44;
 }
 
 :root[data-theme='forest'] {
@@ -111,4 +115,6 @@
   --theme-code-string: #9a5a13;
   --theme-code-number: #2f7d32;
   --theme-code-boolean: #256d85;
+  --theme-json-selection-bg: #d7eadf;
+  --theme-json-selection-bg-muted: #e7efe2;
 }
